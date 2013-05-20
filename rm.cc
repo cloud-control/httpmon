@@ -9,16 +9,12 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-char *mac_ntoa(unsigned char *ptr)
-{
-	static char address[30];
-	sprintf(address, "%02X:%02X:%02X:%02X:%02X:%02X",
-		ptr[0], ptr[1], ptr[2], ptr[3], ptr[4], ptr[5]);
-	return address;
-}
+#include "VirtualManager.hh"
 
 int main(int argc, char **argv)
 {
+	VirtualManager vmm;
+
 	int s = socket(AF_INET, SOCK_DGRAM, 0);
 	if (s == -1) {
 		perror("Fatal error, socket() failed");
@@ -51,8 +47,10 @@ int main(int argc, char **argv)
 			if (ioctl(s, SIOCGARP, &arpreq) == -1) {
 				perror("Error, unable to retrieve MAC address");
 			}
+			const unsigned char *mac = (unsigned char *)&arpreq.arp_ha.sa_data;
+			std::string vmName = vmm.lookUpVmByMac(mac);
 
-			fprintf(stderr, "Got message from %s(%s): %s\n", inet_ntoa(sin.sin_addr), mac_ntoa((unsigned char *)&arpreq.arp_ha.sa_data), buf);
+			fprintf(stderr, "Got message from %s(%s): %s\n", inet_ntoa(sin.sin_addr), vmName.c_str(), buf);
 		}
 		else {
 			perror("Error, recvfrom() failed");
