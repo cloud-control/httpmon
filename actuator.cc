@@ -1,6 +1,7 @@
 #include <boost/program_options.hpp>
 #include <libvirt/libvirt.h>
 #include <libvirt/virterror.h>
+#include <tinyxml.h>
 
 int main(int argc, char **argv)
 {
@@ -62,6 +63,27 @@ int main(int argc, char **argv)
 		for (int i = 0; i < numParams; i++) {
 			std::cerr << " " << params[i].field << "=" << params[i].value.ui;
 		}
+
+		numParams = 10; /* hopefully enough */
+		char *xmlDesc = virDomainGetXMLDesc(domain, 0);
+		if (xmlDesc != NULL) {
+			TiXmlDocument doc;
+			doc.Parse(xmlDesc);
+			TiXmlElement *devicesElement = NULL, *interfaceElement = NULL, *macElement = NULL;
+			const char *macAddress = NULL;
+
+			devicesElement = doc.RootElement()->FirstChildElement("devices");
+			if (devicesElement)
+				interfaceElement = devicesElement->FirstChildElement("interface");
+			if (interfaceElement)
+				macElement = interfaceElement->FirstChildElement("mac");
+			if (macElement)
+				macAddress = macElement->Attribute("address");
+			if (macAddress) {
+				std::cerr << " mac=" << macAddress;
+			}
+		}
+
 		std::cerr << std::endl;
 	}
 
