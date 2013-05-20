@@ -70,11 +70,12 @@ std::string VirtualManager::lookUpVmByMac(const unsigned char lookedUpMac[6])
 			macElement = interfaceElement->FirstChildElement("mac");
 		if (macElement)
 			macAddress = macElement->Attribute("address");
+		if (!macAddress) continue;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat"
 		unsigned char currentMac[6];
-		sscanf(macAddress, "%hhu:%hhu:%hhu:%hhu:%hhu:%hhu",
+		sscanf(macAddress, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx",
 			&currentMac[0], &currentMac[1], &currentMac[2], &currentMac[3], &currentMac[4], &currentMac[5]);
 #pragma GCC diagnostic pop
 
