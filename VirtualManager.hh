@@ -15,7 +15,7 @@ public:
 	~VirtualManager();
 
 	std::vector<std::string> listVms();
-	std::string lookUpVmByMac(unsigned char mac[6]);
+	std::string lookUpVmByMac(const unsigned char mac[6]);
 	void setVmCap(std::string name, int cap);
 
 private:

@@ -39,7 +39,7 @@ std::vector<std::string> VirtualManager::listVms()
 	return ret;
 }
 
-std::string VirtualManager::lookUpVmByMac(unsigned char lookedUpMac[6])
+std::string VirtualManager::lookUpVmByMac(const unsigned char lookedUpMac[6])
 {
 	std::string ret;
 
