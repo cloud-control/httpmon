@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 		virDomainPtr domain = virDomainLookupByID(conn, vms[i]);
 		std::cerr << "- " << virDomainGetName(domain);
 
-		int numParams = 10; /* way too much */
+		int numParams = 10; /* way too many */
 		virTypedParameter params[numParams];
 		virDomainGetSchedulerParameters(domain, params, &numParams);
 
@@ -76,6 +76,24 @@ int main(int argc, char **argv)
 				virGetLastError()->message);
 		}
 
-		int oldCap;
+		virTypedParameter param;
+		strcpy(param.field, VIR_DOMAIN_SCHEDULER_CAP);
+		param.type = VIR_TYPED_PARAM_UINT;
+		param.value.ui = cap;
+		if (virDomainSetSchedulerParameters(domain, &param, 1) == -1) {
+			throw std::runtime_error(std::string() +
+				"Unable to find domain by name: " +
+				virGetLastError()->message);
+		}
+
+		int numParams = 10; /* way too many */
+		virTypedParameter params[numParams];
+		virDomainGetSchedulerParameters(domain, params, &numParams);
+
+		std::cerr << "New scheduling parameters: ";
+		for (int i = 0; i < numParams; i++) {
+			std::cerr << " " << params[i].field << "=" << params[i].value.ui;
+		}
+		std::cerr << std::endl;
 	}
 }
