@@ -1,5 +1,6 @@
 #include <boost/program_options.hpp>
 #include <curl/curl.h>
+#include <mutex>
 #include <poll.h>
 #include <signal.h>
 #include <thread>
@@ -7,6 +8,8 @@
 typedef struct {
 	std::string url;
 	volatile bool running;
+	std::mutex mutex;
+	uint32_t numErrors;
 } HttpClientControl;
 
 size_t nullWriter(char *ptr, size_t size, size_t nmemb, void *userdata)
@@ -22,9 +25,14 @@ int httpClientMain(int id, HttpClientControl &control)
 	curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
 	curl_easy_setopt(curl, CURLOPT_URL, control.url.c_str());
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, nullWriter);
+	curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 
 	while (control.running) {
-		curl_easy_perform(curl);
+		bool error = (curl_easy_perform(curl) != 0);
+
+		std::lock_guard<std::mutex> lock(control.mutex);
+		if (error)
+			control.numErrors ++;
 	}
 	curl_easy_cleanup(curl);
 
@@ -74,6 +82,7 @@ int main(int argc, char **argv)
 	HttpClientControl control;
 	control.running = true;
 	control.url = url;
+	control.numErrors = 0;
 
 	/* Start client threads */
 	std::thread httpClientThreads[concurrency];
@@ -92,14 +101,30 @@ int main(int argc, char **argv)
 	sigaddset(&sigset, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &sigset, NULL);
 
-	int sig;
-	sigwait(&sigset, &sig);
-	fprintf(stderr, "Got signal %d, cleaning up ...\n", sig);
+	/* Report at regular intervals */
+	int signo;
+	while (control.running) {
+		struct timespec timeout = { 1, 0 };
+		signo = sigtimedwait(&sigset, NULL, &timeout);
+
+		if (signo > 0)
+			control.running = false;
+
+		struct timeval now;
+		gettimeofday(&now, NULL);
+
+		int numErrors;
+		{
+			std::lock_guard<std::mutex> lock(control.mutex);
+			numErrors = control.numErrors; control.numErrors = 0;
+		}
+		fprintf(stderr, "[%6ld.%06ld] errors=%d\n", now.tv_sec, now.tv_usec, numErrors);
+	}
+	fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
 
 	/*
 	 * Cleanup
 	 */
-	control.running = false;
 	for (int i = 0; i < concurrency; i++) {
 		httpClientThreads[i].join();
 	}
