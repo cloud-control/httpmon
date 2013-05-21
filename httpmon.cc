@@ -148,7 +148,7 @@ int main(int argc, char **argv)
 			control.maxLatency = 0;
 			control.sumLatency = 0;
 		}
-		fprintf(stderr, "[%6ld.%06ld] latency=%d:%d:%dms throughput=%drps errors=%d\n", now.tv_sec, now.tv_usec, int(minLatency*1000), int(avgLatency*1000), int(maxLatency*1000), int(throughput), numErrors);
+		fprintf(stderr, "[%6ld.%06ld] latency=%04d:%04d:%04dms throughput=%04drps errors=%04d\n", now.tv_sec, now.tv_usec, int(minLatency*1000), int(avgLatency*1000), int(maxLatency*1000), int(throughput), numErrors);
 	}
 	fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
 
