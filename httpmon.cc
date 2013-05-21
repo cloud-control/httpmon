@@ -9,6 +9,11 @@ typedef struct {
 	volatile bool running;
 } HttpClientControl;
 
+size_t nullWriter(char *ptr, size_t size, size_t nmemb, void *userdata)
+{
+	return size * nmemb; /* i.e., pretend we are actually doing something */
+}
+
 int httpClientMain(int id, HttpClientControl &control)
 {
 	fprintf(stderr, "Thread %d executing\n", id);
@@ -16,6 +21,7 @@ int httpClientMain(int id, HttpClientControl &control)
 	CURL *curl = curl_easy_init();
 	curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
 	curl_easy_setopt(curl, CURLOPT_URL, control.url.c_str());
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, nullWriter);
 
 	while (control.running) {
 		curl_easy_perform(curl);
