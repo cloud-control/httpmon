@@ -7,6 +7,7 @@
 
 typedef struct {
 	std::string url;
+	int timeout;
 	volatile bool running;
 	std::mutex mutex;
 	uint32_t numErrors;
@@ -33,7 +34,7 @@ int httpClientMain(int id, HttpClientControl &control)
 	curl_easy_setopt(curl, CURLOPT_URL, control.url.c_str());
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, nullWriter);
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
-	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
+	curl_easy_setopt(curl, CURLOPT_TIMEOUT, control.timeout);
 
 	while (control.running) {
 		/* Send HTTP request */
@@ -67,7 +68,7 @@ int main(int argc, char **argv)
 	 */
 	std::string url;
 	int concurrency;
-	int runfor;
+	int timeout;
 
 	/*
 	 * Parse command-line
@@ -77,7 +78,7 @@ int main(int argc, char **argv)
 		("help", "produce help message")
 		("url", po::value<std::string>(&url), "set URL to request")
 		("concurrency", po::value<int>(&concurrency)->default_value(1000), "set concurrency (number of HTTP client threads)")
-		("runfor", po::value<int>(&runfor)->default_value(-1), "set time to run for in seconds (-1 = infinity)")
+		("timeout", po::value<int>(&timeout)->default_value(9), "set HTTP client timeout in seconds")
 	;
 
 	po::variables_map vm;
@@ -99,6 +100,7 @@ int main(int argc, char **argv)
 	HttpClientControl control;
 	control.running = true;
 	control.url = url;
+	control.timeout = timeout;
 	control.numErrors = 0;
 
 	/* Start client threads */
