@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 	desc.add_options()
 		("help", "produce help message")
 		("url", po::value<std::string>(&url), "set URL to request")
-		("concurrency", po::value<int>(&concurrency)->default_value(1000), "set concurrency (number of HTTP client threads)")
+		("concurrency", po::value<int>(&concurrency)->default_value(100), "set concurrency (number of HTTP client threads)")
 		("timeout", po::value<int>(&timeout)->default_value(9), "set HTTP client timeout in seconds")
 	;
 
