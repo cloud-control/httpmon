@@ -28,8 +28,6 @@ size_t nullWriter(char *ptr, size_t size, size_t nmemb, void *userdata)
 
 int httpClientMain(int id, HttpClientControl &control)
 {
-	fprintf(stderr, "Thread %d executing\n", id);
-
 	CURL *curl = curl_easy_init();
 	curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
 	curl_easy_setopt(curl, CURLOPT_URL, control.url.c_str());
@@ -55,8 +53,6 @@ int httpClientMain(int id, HttpClientControl &control)
 		}
 	}
 	curl_easy_cleanup(curl);
-
-	fprintf(stderr, "Thread %d stopping\n", id);
 
 	return 0;
 }
