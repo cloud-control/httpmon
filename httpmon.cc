@@ -5,6 +5,8 @@
 #include <signal.h>
 #include <thread>
 
+const int SpecialRecommendationMarker = 128;
+
 typedef struct {
 	std::string url;
 	int timeout;
@@ -27,10 +29,7 @@ size_t nullWriter(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	bool *recommendation = (bool *)userdata;
 
-	const char *needle = "Other items you might like";
-	size_t needlelen = strlen(needle);
-
-	if (memmem(ptr, size*nmemb, needle, needlelen) != NULL)
+	if (memchr(ptr, SpecialRecommendationMarker, size*nmemb) != NULL)
 		*recommendation = true;
 	return size * nmemb; /* i.e., pretend we are actually doing something */
 }
