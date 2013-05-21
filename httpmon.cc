@@ -12,6 +12,7 @@ typedef struct {
 	std::mutex mutex;
 	uint32_t numErrors;
 	uint32_t numRequests;
+	uint32_t numRecommendations;
 	double minLatency, maxLatency, sumLatency;
 } HttpClientControl;
 
@@ -24,21 +25,33 @@ double inline now()
 
 size_t nullWriter(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
+	bool *recommendation = (bool *)userdata;
+
+	const char *needle = "Other items you might like";
+	size_t needlelen = strlen(needle);
+
+	if (memmem(ptr, size*nmemb, needle, needlelen) != NULL)
+		*recommendation = true;
 	return size * nmemb; /* i.e., pretend we are actually doing something */
 }
 
 int httpClientMain(int id, HttpClientControl &control)
 {
+	bool recommendation;
+
 	CURL *curl = curl_easy_init();
 	curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
 	curl_easy_setopt(curl, CURLOPT_URL, control.url.c_str());
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, nullWriter);
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, nullWriter);
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, control.timeout);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &recommendation);
 
 	while (control.running) {
 		/* Send HTTP request */
 		double start = now();
+		recommendation = false;
 		bool error = (curl_easy_perform(curl) != 0);
 		double latency = now() - start;
 
@@ -48,6 +61,8 @@ int httpClientMain(int id, HttpClientControl &control)
 			std::lock_guard<std::mutex> lock(control.mutex);
 			if (error)
 				control.numErrors ++;
+			if (recommendation)
+				control.numRecommendations ++;
 			control.numRequests ++;
 			control.sumLatency += latency;
 			control.minLatency = std::min(control.minLatency, latency);
@@ -102,6 +117,7 @@ int main(int argc, char **argv)
 	control.url = url;
 	control.timeout = timeout;
 	control.numErrors = 0;
+	control.numRecommendations = 0;
 
 	/* Start client threads */
 	std::thread httpClientThreads[concurrency];
@@ -122,6 +138,7 @@ int main(int argc, char **argv)
 
 	/* Report at regular intervals */
 	int signo;
+	double lastReport = now();
 	while (control.running) {
 		struct timespec timeout = { 1, 0 };
 		signo = sigtimedwait(&sigset, NULL, &timeout);
@@ -129,26 +146,31 @@ int main(int argc, char **argv)
 		if (signo > 0)
 			control.running = false;
 
-		struct timeval now;
-		gettimeofday(&now, NULL);
-
 		int numErrors;
 		double minLatency, avgLatency, maxLatency, throughput;
+		int recommendationRate;
 		{
 			std::lock_guard<std::mutex> lock(control.mutex);
 			numErrors = control.numErrors;
 			minLatency = control.minLatency;
 			maxLatency = control.maxLatency;
 			avgLatency = control.sumLatency / control.numRequests;
-			throughput = control.numRequests /* XXX: divided by measurement interval which is slightly higher than 1 */;
+			throughput = control.numRequests / (now() - lastReport);
+			recommendationRate = control.numRecommendations * 100 / control.numRequests;
 
 			control.numRequests = 0;
+			control.numRecommendations = 0;
 			control.numErrors = 0;
 			control.minLatency = INFINITY;
 			control.maxLatency = 0;
 			control.sumLatency = 0;
+			lastReport = now();
 		}
-		fprintf(stderr, "[%6ld.%06ld] latency=%04d:%04d:%04dms throughput=%04drps errors=%04d\n", now.tv_sec, now.tv_usec, int(minLatency*1000), int(avgLatency*1000), int(maxLatency*1000), int(throughput), numErrors);
+
+		fprintf(stderr, "[%6d.%06d] latency=%04d:%04d:%04dms throughput=%04drps rr=%2d%% errors=%04d\n",
+			int(lastReport), int((lastReport - int(lastReport)) * 1000000),
+			int(minLatency*1000), int(avgLatency*1000), int(maxLatency*1000),
+			int(throughput), recommendationRate, numErrors);
 	}
 	fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
 
