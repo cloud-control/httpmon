@@ -10,7 +10,16 @@ typedef struct {
 	volatile bool running;
 	std::mutex mutex;
 	uint32_t numErrors;
+	uint32_t numRequests;
+	double minLatency, maxLatency, sumLatency;
 } HttpClientControl;
+
+double inline now()
+{
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return (double)tv.tv_usec / 1000000 + tv.tv_sec;
+}
 
 size_t nullWriter(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
@@ -28,11 +37,22 @@ int httpClientMain(int id, HttpClientControl &control)
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 
 	while (control.running) {
+		/* Send HTTP request */
+		double start = now();
 		bool error = (curl_easy_perform(curl) != 0);
+		double latency = now() - start;
 
-		std::lock_guard<std::mutex> lock(control.mutex);
-		if (error)
-			control.numErrors ++;
+		/* Add data to report */
+		/* XXX: one day, this might be a bottleneck */
+		{
+			std::lock_guard<std::mutex> lock(control.mutex);
+			if (error)
+				control.numErrors ++;
+			control.numRequests ++;
+			control.sumLatency += latency;
+			control.minLatency = std::min(control.minLatency, latency);
+			control.maxLatency = std::max(control.maxLatency, latency);
+		}
 	}
 	curl_easy_cleanup(curl);
 
@@ -114,11 +134,22 @@ int main(int argc, char **argv)
 		gettimeofday(&now, NULL);
 
 		int numErrors;
+		double minLatency, avgLatency, maxLatency, throughput;
 		{
 			std::lock_guard<std::mutex> lock(control.mutex);
-			numErrors = control.numErrors; control.numErrors = 0;
+			numErrors = control.numErrors;
+			minLatency = control.minLatency;
+			maxLatency = control.maxLatency;
+			avgLatency = control.sumLatency / control.numRequests;
+			throughput = control.numRequests /* XXX: divided by measurement interval which is slightly higher than 1 */;
+
+			control.numRequests = 0;
+			control.numErrors = 0;
+			control.minLatency = INFINITY;
+			control.maxLatency = 0;
+			control.sumLatency = 0;
 		}
-		fprintf(stderr, "[%6ld.%06ld] errors=%d\n", now.tv_sec, now.tv_usec, numErrors);
+		fprintf(stderr, "[%6ld.%06ld] latency=%d:%d:%dms throughput=%drps errors=%d\n", now.tv_sec, now.tv_usec, int(minLatency*1000), int(avgLatency*1000), int(maxLatency*1000), int(throughput), numErrors);
 	}
 	fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
 
