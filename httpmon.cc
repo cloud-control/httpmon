@@ -1,4 +1,5 @@
 #include <boost/program_options.hpp>
+#include <curl/curl.h>
 #include <poll.h>
 #include <signal.h>
 #include <thread>
@@ -12,10 +13,15 @@ int httpClientMain(int id, HttpClientControl &control)
 {
 	fprintf(stderr, "Thread %d executing\n", id);
 
+	CURL *curl = curl_easy_init();
+	curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+	curl_easy_setopt(curl, CURLOPT_URL, control.url.c_str());
+
 	while (control.running) {
-		sleep(1);
+		curl_easy_perform(curl);
 	}
-	
+	curl_easy_cleanup(curl);
+
 	fprintf(stderr, "Thread %d stopping\n", id);
 
 	return 0;
@@ -56,6 +62,8 @@ int main(int argc, char **argv)
 	 * Start HTTP client threads
 	 */
 
+	curl_global_init(CURL_GLOBAL_ALL);
+
 	/* Setup thread control structure */
 	HttpClientControl control;
 	control.running = true;
@@ -89,6 +97,7 @@ int main(int argc, char **argv)
 	for (int i = 0; i < concurrency; i++) {
 		httpClientThreads[i].join();
 	}
+	curl_global_cleanup();
 
 	return 0;
 }
