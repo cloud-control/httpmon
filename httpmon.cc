@@ -1,9 +1,12 @@
+#include <algorithm>
+#include <array>
 #include <boost/program_options.hpp>
 #include <curl/curl.h>
 #include <mutex>
 #include <poll.h>
 #include <signal.h>
 #include <thread>
+#include <vector>
 
 const int SpecialRecommendationMarker = 128;
 
@@ -13,9 +16,8 @@ typedef struct {
 	volatile bool running;
 	std::mutex mutex;
 	uint32_t numErrors;
-	uint32_t numRequests;
 	uint32_t numRecommendations;
-	double minLatency, maxLatency, sumLatency;
+	std::vector<double> latencies;
 } HttpClientControl;
 
 double inline now()
@@ -23,6 +25,39 @@ double inline now()
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 	return (double)tv.tv_usec / 1000000 + tv.tv_sec;
+}
+
+template<typename T>
+typename T::value_type median(T begin, T end)
+{
+	/* assumes vector is sorted */
+	int n = end - begin;
+
+	if ((n-1) % 2 == 0)
+		return *(begin+(n-1)/2);
+	else
+		return (*(begin+(n-1)/2) + *(begin+(n-1)/2+1))/2;
+}
+
+template<typename T>
+std::array<typename T::value_type, 5> quartiles(T &a)
+{
+	/* return value: minimum, first quartile, median, third quartile, maximum */
+	std::array<typename T::value_type, 5> ret;
+
+	size_t n = a.size();
+	if (n < 1)
+		throw std::logic_error("No data to compute quartiles on");
+	std::sort(a.begin(), a.end());
+
+	ret[0] = a[0]  ; /* minimum */
+	ret[4] = a[n-1]; /* maximum */
+
+	ret[2] = median(a.begin(), a.end());
+	ret[1] = median(a.begin(), a.begin() + n / 2);
+	ret[3] = median(a.begin() + n / 2, a.end());
+
+	return ret;
 }
 
 size_t nullWriter(char *ptr, size_t size, size_t nmemb, void *userdata)
@@ -62,10 +97,7 @@ int httpClientMain(int id, HttpClientControl &control)
 				control.numErrors ++;
 			if (recommendation)
 				control.numRecommendations ++;
-			control.numRequests ++;
-			control.sumLatency += latency;
-			control.minLatency = std::min(control.minLatency, latency);
-			control.maxLatency = std::max(control.maxLatency, latency);
+			control.latencies.push_back(latency);
 		}
 	}
 	curl_easy_cleanup(curl);
@@ -137,7 +169,7 @@ int main(int argc, char **argv)
 
 	/* Report at regular intervals */
 	int signo;
-	double lastReport = now();
+	double lastReportTime = now();
 	while (control.running) {
 		struct timespec timeout = { 1, 0 };
 		signo = sigtimedwait(&sigset, NULL, &timeout);
@@ -146,30 +178,35 @@ int main(int argc, char **argv)
 			control.running = false;
 
 		int numErrors;
-		double minLatency, avgLatency, maxLatency, throughput;
-		int recommendationRate;
+		int numRecommendations;
+		std::vector<double> latencies;
+		double reportTime;
 		{
 			std::lock_guard<std::mutex> lock(control.mutex);
-			numErrors = control.numErrors;
-			minLatency = control.minLatency;
-			maxLatency = control.maxLatency;
-			avgLatency = control.sumLatency / control.numRequests;
-			throughput = control.numRequests / (now() - lastReport);
-			recommendationRate = control.numRecommendations * 100 / control.numRequests;
 
-			control.numRequests = 0;
-			control.numRecommendations = 0;
+			numErrors = control.numErrors;
+			numRecommendations = control.numRecommendations;
+			latencies = control.latencies;
+
 			control.numErrors = 0;
-			control.minLatency = INFINITY;
-			control.maxLatency = 0;
-			control.sumLatency = 0;
-			lastReport = now();
+			control.numRecommendations = 0;
+			control.latencies.clear();
+			reportTime = now();
 		}
 
-		fprintf(stderr, "[%6d.%06d] latency=%04d:%04d:%04dms throughput=%04drps rr=%02d%% errors=%04d\n",
-			int(lastReport), int((lastReport - int(lastReport)) * 1000000),
-			int(minLatency*1000), int(avgLatency*1000), int(maxLatency*1000),
-			int(throughput), recommendationRate, numErrors);
+		int throughput = (double)latencies.size() / (reportTime - lastReportTime);
+		int recommendationRate = numRecommendations * 100 / latencies.size();
+		auto latencyQuartiles = quartiles(latencies);
+		lastReportTime = reportTime;
+
+		fprintf(stderr, "[%f] latency=%04d:%04d:%04d:%04d:%04dms throughput=%04drps rr=%02d%% errors=%04d\n",
+			reportTime,
+			int(latencyQuartiles[0] * 1000),
+			int(latencyQuartiles[1] * 1000),
+			int(latencyQuartiles[2] * 1000),
+			int(latencyQuartiles[3] * 1000),
+			int(latencyQuartiles[4] * 1000),
+			throughput, recommendationRate, numErrors);
 	}
 	fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
 
