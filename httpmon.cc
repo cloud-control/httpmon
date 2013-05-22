@@ -136,6 +136,7 @@ int main(int argc, char **argv)
 	int concurrency;
 	int timeout;
 	double thinkTime;
+	double interval;
 
 	/*
 	 * Parse command-line
@@ -147,6 +148,7 @@ int main(int argc, char **argv)
 		("concurrency", po::value<int>(&concurrency)->default_value(100), "set concurrency (number of HTTP client threads)")
 		("timeout", po::value<int>(&timeout)->default_value(9), "set HTTP client timeout in seconds")
 		("thinktime", po::value<double>(&thinkTime)->default_value(0), "add a random (à la Poisson) interval between requests in seconds")
+		("interval", po::value<double>(&interval)->default_value(1), "set report interval in seconds")
 	;
 
 	po::variables_map vm;
@@ -194,7 +196,7 @@ int main(int argc, char **argv)
 	int signo;
 	double lastReportTime = now();
 	while (control.running) {
-		struct timespec timeout = { 1, 0 };
+		struct timespec timeout = { int(interval), int((interval-(int)interval) * NanoSecondsInASecond)};
 		signo = sigtimedwait(&sigset, NULL, &timeout);
 
 		if (signo > 0)
