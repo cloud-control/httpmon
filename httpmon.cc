@@ -92,6 +92,11 @@ int httpClientMain(int id, HttpClientControl &control)
 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, control.timeout);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &recommendation);
 
+	std::default_random_engine rng; /* random number generator */
+	std::exponential_distribution<double> waitDistribution(1 / control.thinkTime);
+
+	rng.seed(now() + id);
+
 	while (control.running) {
 		/* Send HTTP request */
 		double start = now();
@@ -109,6 +114,11 @@ int httpClientMain(int id, HttpClientControl &control)
 				control.numRecommendations ++;
 			control.latencies.push_back(latency);
 		}
+
+		if (control.thinkTime > 0) {
+			double wait = waitDistribution(rng);
+			usleep(wait * 1000000);
+		}
 	}
 	curl_easy_cleanup(curl);
 
@@ -125,6 +135,7 @@ int main(int argc, char **argv)
 	std::string url;
 	int concurrency;
 	int timeout;
+	double thinkTime;
 
 	/*
 	 * Parse command-line
@@ -135,6 +146,7 @@ int main(int argc, char **argv)
 		("url", po::value<std::string>(&url), "set URL to request")
 		("concurrency", po::value<int>(&concurrency)->default_value(100), "set concurrency (number of HTTP client threads)")
 		("timeout", po::value<int>(&timeout)->default_value(9), "set HTTP client timeout in seconds")
+		("thinktime", po::value<double>(&thinkTime)->default_value(0), "add a random (à la Poisson) interval between requests in seconds")
 	;
 
 	po::variables_map vm;
@@ -157,6 +169,7 @@ int main(int argc, char **argv)
 	control.running = true;
 	control.url = url;
 	control.timeout = timeout;
+	control.thinkTime = thinkTime;
 	control.numErrors = 0;
 	control.numRecommendations = 0;
 
