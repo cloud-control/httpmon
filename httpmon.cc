@@ -146,7 +146,7 @@ int main(int argc, char **argv)
 		("help", "produce help message")
 		("url", po::value<std::string>(&url), "set URL to request")
 		("concurrency", po::value<int>(&concurrency)->default_value(100), "set concurrency (number of HTTP client threads)")
-		("timeout", po::value<int>(&timeout)->default_value(9), "set HTTP client timeout in seconds")
+		("timeout", po::value<int>(&timeout)->default_value(0), "set HTTP client timeout in seconds")
 		("thinktime", po::value<double>(&thinkTime)->default_value(0), "add a random (à la Poisson) interval between requests in seconds")
 		("interval", po::value<double>(&interval)->default_value(1), "set report interval in seconds")
 	;
