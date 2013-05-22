@@ -166,7 +166,7 @@ int main(int argc, char **argv)
 			lastReport = now();
 		}
 
-		fprintf(stderr, "[%6d.%06d] latency=%04d:%04d:%04dms throughput=%04drps rr=%2d%% errors=%04d\n",
+		fprintf(stderr, "[%6d.%06d] latency=%04d:%04d:%04dms throughput=%04drps rr=%02d%% errors=%04d\n",
 			int(lastReport), int((lastReport - int(lastReport)) * 1000000),
 			int(minLatency*1000), int(avgLatency*1000), int(maxLatency*1000),
 			int(throughput), recommendationRate, numErrors);
