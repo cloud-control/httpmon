@@ -4,15 +4,18 @@
 #include <curl/curl.h>
 #include <mutex>
 #include <poll.h>
+#include <random>
 #include <signal.h>
 #include <thread>
 #include <vector>
 
 const int SpecialRecommendationMarker = 128;
+const long NanoSecondsInASecond = 1000000000;
 
 typedef struct {
 	std::string url;
 	int timeout;
+	double thinkTime;
 	volatile bool running;
 	std::mutex mutex;
 	uint32_t numErrors;
@@ -43,11 +46,11 @@ template<typename T>
 std::array<typename T::value_type, 5> quartiles(T &a)
 {
 	/* return value: minimum, first quartile, median, third quartile, maximum */
-	std::array<typename T::value_type, 5> ret;
+	std::array<typename T::value_type, 5> ret = {{ NAN, NAN, NAN, NAN, NAN }};
 
 	size_t n = a.size();
 	if (n < 1)
-		throw std::logic_error("No data to compute quartiles on");
+		return ret;
 	std::sort(a.begin(), a.end());
 
 	ret[0] = a[0]  ; /* minimum */
@@ -58,6 +61,13 @@ std::array<typename T::value_type, 5> quartiles(T &a)
 	ret[3] = median(a.begin() + n / 2, a.end());
 
 	return ret;
+}
+
+template<typename T>
+double average(const T &a)
+{
+	double sum = std::accumulate(a.begin(), a.end(), 0.0);
+	return sum / a.size();
 }
 
 size_t nullWriter(char *ptr, size_t size, size_t nmemb, void *userdata)
@@ -195,18 +205,19 @@ int main(int argc, char **argv)
 		}
 
 		int throughput = (double)latencies.size() / (reportTime - lastReportTime);
-		int recommendationRate = numRecommendations * 100 / latencies.size();
+		double recommendationRate = (double)numRecommendations / latencies.size();
 		auto latencyQuartiles = quartiles(latencies);
 		lastReportTime = reportTime;
 
-		fprintf(stderr, "[%f] latency=%04d:%04d:%04d:%04d:%04dms throughput=%04drps rr=%02d%% errors=%04d\n",
+		fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms throughput=%04drps rr=%.0f%% errors=%04d\n",
 			reportTime,
-			int(latencyQuartiles[0] * 1000),
-			int(latencyQuartiles[1] * 1000),
-			int(latencyQuartiles[2] * 1000),
-			int(latencyQuartiles[3] * 1000),
-			int(latencyQuartiles[4] * 1000),
-			throughput, recommendationRate, numErrors);
+			latencyQuartiles[0] * 1000,
+			latencyQuartiles[1] * 1000,
+			latencyQuartiles[2] * 1000,
+			latencyQuartiles[3] * 1000,
+			latencyQuartiles[4] * 1000,
+			average(latencies) * 1000,
+			throughput, recommendationRate * 100, numErrors);
 	}
 	fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
 
