@@ -115,6 +115,10 @@ int httpClientMain(int id, HttpClientControl &control)
 			control.latencies.push_back(latency);
 		}
 
+		/* If an error has occured, we might spin and lock "control" */
+		if (error)
+			usleep(0);
+
 		if (control.thinkTime > 0) {
 			double wait = waitDistribution(rng);
 			usleep(wait * 1000000);
@@ -158,6 +162,10 @@ int main(int argc, char **argv)
 	if (vm.count("help")) {
 		std::cout << desc << "\n";
 		return 1;
+	}
+	
+	if (url.empty()) {
+		std::cerr << "Warning, empty URL given. Expect high CPU usage and many errors." << std::endl;
 	}
 
 	/*
