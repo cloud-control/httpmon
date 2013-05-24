@@ -1,0 +1,49 @@
+1369408482
+Currently running VMs
+- Domain-0 weight=256 cap=0
+- olio-hvm weight=256 cap=0 mac=aa:00:00:00:00:12
+- rubbos-hvm weight=256 cap=400 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=400 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=400
+1369408543
+Currently running VMs
+- Domain-0 weight=256 cap=0
+- olio-hvm weight=256 cap=0 mac=aa:00:00:00:00:12
+- rubbos-hvm weight=256 cap=400 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=400 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=200
+1369408604
+Currently running VMs
+- Domain-0 weight=256 cap=0
+- olio-hvm weight=256 cap=0 mac=aa:00:00:00:00:12
+- rubbos-hvm weight=256 cap=400 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=200 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=100
+1369408664
+Currently running VMs
+- Domain-0 weight=256 cap=0
+- olio-hvm weight=256 cap=0 mac=aa:00:00:00:00:12
+- rubbos-hvm weight=256 cap=400 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=100 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=50
+1369408725
+Currently running VMs
+- Domain-0 weight=256 cap=0
+- olio-hvm weight=256 cap=0 mac=aa:00:00:00:00:12
+- rubbos-hvm weight=256 cap=400 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=50 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=100
+1369408785
+Currently running VMs
+- Domain-0 weight=256 cap=0
+- olio-hvm weight=256 cap=0 mac=aa:00:00:00:00:12
+- rubbos-hvm weight=256 cap=400 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=100 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=200
+1369408846
+Currently running VMs
+- Domain-0 weight=256 cap=0
+- olio-hvm weight=256 cap=0 mac=aa:00:00:00:00:12
+- rubbos-hvm weight=256 cap=400 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=200 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=400
