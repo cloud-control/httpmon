@@ -227,12 +227,12 @@ int main(int argc, char **argv)
 			reportTime = now();
 		}
 
-		int throughput = (double)latencies.size() / (reportTime - lastReportTime);
+		double throughput = (double)latencies.size() / (reportTime - lastReportTime);
 		double recommendationRate = (double)numRecommendations / latencies.size();
 		auto latencyQuartiles = quartiles(latencies);
 		lastReportTime = reportTime;
 
-		fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms throughput=%04drps rr=%.0f%% errors=%04d\n",
+		fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms throughput=%.0frps rr=%.0f%% errors=%d\n",
 			reportTime,
 			latencyQuartiles[0] * 1000,
 			latencyQuartiles[1] * 1000,
