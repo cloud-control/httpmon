@@ -252,9 +252,7 @@ int main(int argc, char **argv)
 	for (int i = 0; i < concurrency; i++) {
 		httpClientThreads[i].join();
 	}
-	fprintf(stderr, "2 Got signal %d, cleaning up ...\n", signo);
 	curl_global_cleanup();
-	fprintf(stderr, "3 Got signal %d, cleaning up ...\n", signo);
 
 	/* Final stats */
 	/* XXX: de-duplicate code */
