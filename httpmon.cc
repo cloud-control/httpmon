@@ -203,6 +203,7 @@ int main(int argc, char **argv)
 	/* Report at regular intervals */
 	int signo;
 	double lastReportTime = now();
+	int totalRequests = 0;
 	while (control.running) {
 		struct timespec timeout = { int(interval), int((interval-(int)interval) * NanoSecondsInASecond)};
 		signo = sigtimedwait(&sigset, NULL, &timeout);
@@ -231,8 +232,9 @@ int main(int argc, char **argv)
 		double recommendationRate = (double)numRecommendations / latencies.size();
 		auto latencyQuartiles = quartiles(latencies);
 		lastReportTime = reportTime;
+		totalRequests += latencies.size();
 
-		fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms throughput=%.0frps rr=%.0f%% errors=%d\n",
+		fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms throughput=%.0frps rr=%.0f%% errors=%d total=%d\n",
 			reportTime,
 			latencyQuartiles[0] * 1000,
 			latencyQuartiles[1] * 1000,
@@ -240,7 +242,7 @@ int main(int argc, char **argv)
 			latencyQuartiles[3] * 1000,
 			latencyQuartiles[4] * 1000,
 			average(latencies) * 1000,
-			throughput, recommendationRate * 100, numErrors);
+			throughput, recommendationRate * 100, numErrors, totalRequests);
 	}
 	fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
 
