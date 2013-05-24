@@ -252,7 +252,46 @@ int main(int argc, char **argv)
 	for (int i = 0; i < concurrency; i++) {
 		httpClientThreads[i].join();
 	}
+	fprintf(stderr, "2 Got signal %d, cleaning up ...\n", signo);
 	curl_global_cleanup();
+	fprintf(stderr, "3 Got signal %d, cleaning up ...\n", signo);
+
+	/* Final stats */
+	/* XXX: de-duplicate code */
+	{
+		int numErrors;
+		int numRecommendations;
+		std::vector<double> latencies;
+		double reportTime;
+		{
+			std::lock_guard<std::mutex> lock(control.mutex);
+
+			numErrors = control.numErrors;
+			numRecommendations = control.numRecommendations;
+			latencies = control.latencies;
+
+			control.numErrors = 0;
+			control.numRecommendations = 0;
+			control.latencies.clear();
+			reportTime = now();
+		}
+
+		double throughput = (double)latencies.size() / (reportTime - lastReportTime);
+		double recommendationRate = (double)numRecommendations / latencies.size();
+		auto latencyQuartiles = quartiles(latencies);
+		lastReportTime = reportTime;
+		totalRequests += latencies.size();
+
+		fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms throughput=%.0frps rr=%.0f%% errors=%d total=%d\n",
+			reportTime,
+			latencyQuartiles[0] * 1000,
+			latencyQuartiles[1] * 1000,
+			latencyQuartiles[2] * 1000,
+			latencyQuartiles[3] * 1000,
+			latencyQuartiles[4] * 1000,
+			average(latencies) * 1000,
+			throughput, recommendationRate * 100, numErrors, totalRequests);
+	}
 
 	return 0;
 }
