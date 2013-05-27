@@ -3,7 +3,7 @@
 function setCap {
 	echo `date +%s` cap=$1
 	./actuator --vm rubis-hvm --cap $1 > /dev/null 2> /dev/null
-	sleep 60
+	sleep 120
 }
 
 setCap 400
