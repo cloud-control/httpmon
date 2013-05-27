@@ -1,0 +1,5 @@
+In these experiments the controller has to control the maximum latency, whose set point is 1 second.
+
+The "inter-cap-change" time has been increased to 120 seconds, to allow the controller to settle.
+
+The control interval is 1 second, whereas the maximum latency is measured over the last 5 seconds.
