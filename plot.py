@@ -12,7 +12,7 @@ maxLatencySeries = []
 recommenderRatioSeries = []
 capChanges = []
 
-t0 = None
+t0 = 0
 for line in stdin.readlines():
 	try:
 		timestamp = float(re.search("\[([0-9.]+)\]", line).group(1))
@@ -20,9 +20,7 @@ for line in stdin.readlines():
 		minLatency = float(re.search("latency=([0-9.]+):[0-9.]+:[0-9.]+:[0-9.]+:[0-9.]+:\([0-9.]+\)", line).group(1))
 		maxLatency = float(re.search("latency=[0-9.]+:[0-9.]+:[0-9.]+:[0-9.]+:([0-9.]+):\([0-9.]+\)", line).group(1))
 		rr = float(re.search("rr=([0-9.]+)", line).group(1))
-		if t0 is None:
-			t0 = timestamp
-		timestampSeries.append(timestamp-t0)
+		timestampSeries.append(timestamp)
 		avgLatencySeries.append(avgLatency)
 		maxLatencySeries.append(maxLatency)
 		recommenderRatioSeries.append(rr)
@@ -31,19 +29,22 @@ for line in stdin.readlines():
 		try:
 			timestamp = float(re.match("([0-9.]+)", line).group(1))
 			cap = float(re.search("cap=([0-9.]+)", line).group(1))
-			if t0 is None:
+			if t0 == 0:
 				t0 = timestamp
-			timestamp = float(timestamp) - float(t0)
+			timestamp = float(timestamp)
 			capChanges.append((timestamp, cap))
 			processed = True
 		except AttributeError:
 			print("Ignoring line: " + line.strip(), file = stderr)
 
+# Make timestamps relative to experiment start
+capChanges = [ (t-t0, c) for t,c in capChanges ]
+timestampSeries = [ t-t0 for t in timestampSeries ]
 
 ax1 = plt.subplot(111)
 ax1.set_xlabel('time (s)')
 ax1.set_ylabel('latency (ms)')
-ax1.set_yscale('log')
+#ax1.set_yscale('log')
 ax1.set_xlim(0, 7*60)
 ax1.grid()
 
@@ -58,5 +59,5 @@ ax1.axhline(y = 1000, color = 'black', lw = 2)
 for timestamp, cap in capChanges:
 	ax2.text(timestamp+1, 97, str(cap))
 	ax2.axvline(x = timestamp, color = 'black', lw = 2)
-ax1.legend(loc = 4)
+ax1.legend(loc = 5)
 plt.show()
