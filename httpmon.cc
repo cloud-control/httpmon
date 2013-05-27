@@ -234,7 +234,7 @@ int main(int argc, char **argv)
 		lastReportTime = reportTime;
 		totalRequests += latencies.size();
 
-		fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms throughput=%.0frps rr=%.0f%% errors=%d total=%d\n",
+		fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms throughput=%.0frps rr=%.2f%% errors=%d total=%d\n",
 			reportTime,
 			latencyQuartiles[0] * 1000,
 			latencyQuartiles[1] * 1000,
