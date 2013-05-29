@@ -64,6 +64,15 @@ int main(int argc, char **argv)
 			std::cerr << " " << params[i].field << "=" << params[i].value.ui;
 		}
 
+		virVcpuInfo vcpuInfos[64];
+		int nmaxvcpus = virDomainGetVcpus(domain, vcpuInfos, 64, NULL, 0);
+		int nvcpus = 0;
+		for (int i = 0; i < nmaxvcpus; i++)
+			if (vcpuInfos[i].state != VIR_VCPU_OFFLINE)
+				nvcpus ++;
+
+		std::cerr << " vcpus=" << nvcpus;
+
 		numParams = 10; /* hopefully enough */
 		char *xmlDesc = virDomainGetXMLDesc(domain, 0);
 		if (xmlDesc != NULL) {
@@ -98,6 +107,9 @@ int main(int argc, char **argv)
 				virGetLastError()->message);
 		}
 
+		int nvcpus = cap / 100 + ((cap % 100 == 0) ? 0 : 1);
+		virDomainSetVcpus(domain, nvcpus);
+
 		virTypedParameter param;
 		strcpy(param.field, VIR_DOMAIN_SCHEDULER_CAP);
 		param.type = VIR_TYPED_PARAM_UINT;
@@ -116,6 +128,6 @@ int main(int argc, char **argv)
 		for (int i = 0; i < numParams; i++) {
 			std::cerr << " " << params[i].field << "=" << params[i].value.ui;
 		}
-		std::cerr << std::endl;
+		std::cerr << " vcpus=" << nvcpus << std::endl;
 	}
 }
