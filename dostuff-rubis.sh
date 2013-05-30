@@ -8,8 +8,9 @@ function setCap {
 
 setCap 400
 setCap 200
-setCap 100
 setCap  50
+setCap 300
 setCap 100
 setCap 200
+setCap  50
 setCap 400
