@@ -9,7 +9,11 @@
 #include <thread>
 #include <vector>
 
-const int SpecialRecommendationMarker = 128;
+#define OPTIONAL_STUFF1 0x01
+#define OPTIONAL_STUFF2 0x02
+
+const int OptionalStuffMarker1 = 128;
+const int OptionalStuffMarker2 = 129;
 const long NanoSecondsInASecond = 1000000000;
 
 typedef struct {
@@ -19,7 +23,8 @@ typedef struct {
 	volatile bool running;
 	std::mutex mutex;
 	uint32_t numErrors;
-	uint32_t numRecommendations;
+	uint32_t numOptionalStuff1;
+	uint32_t numOptionalStuff2;
 	std::vector<double> latencies;
 } HttpClientControl;
 
@@ -72,16 +77,18 @@ double average(const T &a)
 
 size_t nullWriter(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
-	bool *recommendation = (bool *)userdata;
+	uint32_t *optionalStuff = (uint32_t *)userdata;
 
-	if (memchr(ptr, SpecialRecommendationMarker, size*nmemb) != NULL)
-		*recommendation = true;
+	if (memchr(ptr, OptionalStuffMarker1, size*nmemb) != NULL)
+		*optionalStuff |= OPTIONAL_STUFF1;
+	if (memchr(ptr, OptionalStuffMarker2, size*nmemb) != NULL)
+		*optionalStuff |= OPTIONAL_STUFF2;
 	return size * nmemb; /* i.e., pretend we are actually doing something */
 }
 
 int httpClientMain(int id, HttpClientControl &control)
 {
-	bool recommendation;
+	uint32_t optionalStuff;
 
 	CURL *curl = curl_easy_init();
 	curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
@@ -90,7 +97,7 @@ int httpClientMain(int id, HttpClientControl &control)
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, nullWriter);
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, control.timeout);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &recommendation);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &optionalStuff);
 
 	std::default_random_engine rng; /* random number generator */
 	std::exponential_distribution<double> waitDistribution(1 / control.thinkTime);
@@ -100,7 +107,7 @@ int httpClientMain(int id, HttpClientControl &control)
 	while (control.running) {
 		/* Send HTTP request */
 		double start = now();
-		recommendation = false;
+		optionalStuff = 0;
 		bool error = (curl_easy_perform(curl) != 0);
 		double latency = now() - start;
 
@@ -110,8 +117,10 @@ int httpClientMain(int id, HttpClientControl &control)
 			std::lock_guard<std::mutex> lock(control.mutex);
 			if (error)
 				control.numErrors ++;
-			if (recommendation)
-				control.numRecommendations ++;
+			if (optionalStuff & OPTIONAL_STUFF1)
+				control.numOptionalStuff1 ++;
+			if (optionalStuff & OPTIONAL_STUFF2)
+				control.numOptionalStuff2 ++;
 			control.latencies.push_back(latency);
 		}
 
@@ -181,7 +190,8 @@ int main(int argc, char **argv)
 	control.timeout = timeout;
 	control.thinkTime = thinkTime;
 	control.numErrors = 0;
-	control.numRecommendations = 0;
+	control.numOptionalStuff1 = 0;
+	control.numOptionalStuff2 = 0;
 
 	/* Start client threads */
 	std::thread httpClientThreads[concurrency];
@@ -212,29 +222,33 @@ int main(int argc, char **argv)
 			control.running = false;
 
 		int numErrors;
-		int numRecommendations;
+		int numOptionalStuff1;
+		int numOptionalStuff2;
 		std::vector<double> latencies;
 		double reportTime;
 		{
 			std::lock_guard<std::mutex> lock(control.mutex);
 
 			numErrors = control.numErrors;
-			numRecommendations = control.numRecommendations;
+			numOptionalStuff1 = control.numOptionalStuff1;
+			numOptionalStuff2 = control.numOptionalStuff2;
 			latencies = control.latencies;
 
 			control.numErrors = 0;
-			control.numRecommendations = 0;
+			control.numOptionalStuff1 = 0;
+			control.numOptionalStuff2 = 0;
 			control.latencies.clear();
 			reportTime = now();
 		}
 
 		double throughput = (double)latencies.size() / (reportTime - lastReportTime);
-		double recommendationRate = (double)numRecommendations / latencies.size();
+		double recommendationRate = (double)numOptionalStuff1 / latencies.size();
+		double commentRate = (double)numOptionalStuff2 / latencies.size();
 		auto latencyQuartiles = quartiles(latencies);
 		lastReportTime = reportTime;
 		totalRequests += latencies.size();
 
-		fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms throughput=%.0frps rr=%.2f%% errors=%d total=%d\n",
+		fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms throughput=%.0frps rr=%.2f%% cr=%.2f%% errors=%d total=%d\n",
 			reportTime,
 			latencyQuartiles[0] * 1000,
 			latencyQuartiles[1] * 1000,
@@ -242,7 +256,10 @@ int main(int argc, char **argv)
 			latencyQuartiles[3] * 1000,
 			latencyQuartiles[4] * 1000,
 			average(latencies) * 1000,
-			throughput, recommendationRate * 100, numErrors, totalRequests);
+			throughput,
+			recommendationRate * 100,
+			commentRate * 100,
+			numErrors, totalRequests);
 	}
 	fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
 
@@ -258,29 +275,33 @@ int main(int argc, char **argv)
 	/* XXX: de-duplicate code */
 	{
 		int numErrors;
-		int numRecommendations;
+		int numOptionalStuff1;
+		int numOptionalStuff2;
 		std::vector<double> latencies;
 		double reportTime;
 		{
 			std::lock_guard<std::mutex> lock(control.mutex);
 
 			numErrors = control.numErrors;
-			numRecommendations = control.numRecommendations;
+			numOptionalStuff1 = control.numOptionalStuff1;
+			numOptionalStuff2 = control.numOptionalStuff2;
 			latencies = control.latencies;
 
 			control.numErrors = 0;
-			control.numRecommendations = 0;
+			control.numOptionalStuff1 = 0;
+			control.numOptionalStuff2 = 0;
 			control.latencies.clear();
 			reportTime = now();
 		}
 
 		double throughput = (double)latencies.size() / (reportTime - lastReportTime);
-		double recommendationRate = (double)numRecommendations / latencies.size();
+		double recommendationRate = (double)numOptionalStuff1 / latencies.size();
+		double commentRate = (double)numOptionalStuff2 / latencies.size();
 		auto latencyQuartiles = quartiles(latencies);
 		lastReportTime = reportTime;
 		totalRequests += latencies.size();
 
-		fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms throughput=%.0frps rr=%.0f%% errors=%d total=%d\n",
+		fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms throughput=%.0frps rr=%.2f%% cr=%.2f%% errors=%d total=%d\n",
 			reportTime,
 			latencyQuartiles[0] * 1000,
 			latencyQuartiles[1] * 1000,
@@ -288,7 +309,10 @@ int main(int argc, char **argv)
 			latencyQuartiles[3] * 1000,
 			latencyQuartiles[4] * 1000,
 			average(latencies) * 1000,
-			throughput, recommendationRate * 100, numErrors, totalRequests);
+			throughput,
+			recommendationRate * 100,
+			commentRate * 100,
+			numErrors, totalRequests);
 	}
 
 	return 0;
