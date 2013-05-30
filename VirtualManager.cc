@@ -95,6 +95,9 @@ void VirtualManager::setVmCap(std::string name, int cap)
 			virGetLastError()->message);
 	}
 
+	int nvcpus = cap / 100 + ((cap % 100 == 0) ? 0 : 1);
+	virDomainSetVcpus(domain, nvcpus);
+
 	virTypedParameter param;
 	strcpy(param.field, VIR_DOMAIN_SCHEDULER_CAP);
 	param.type = VIR_TYPED_PARAM_UINT;
