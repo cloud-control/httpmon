@@ -1,0 +1,9 @@
+Tests with rubbos-hvm on p07.ds.cs.umu.se
+
+Clients:
+./httpmon --concurrency 100 --url http://rubbos-hvm/PHP/RandomStory.php --thinktime 0.1
+
+Controller:
+pole = 0.8
+MEASURE_INTERVAL = 5
+upslope 0.1
