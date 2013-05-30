@@ -50,7 +50,7 @@ ax1.grid()
 
 ax2 = ax1.twinx()
 ax2.set_ylabel('service level (%)', color = 'g')
-ax2.set_xlim(0, 7*120)
+ax2.set_xlim(0, max(capChanges)[0] + 120)
 
 ax1.plot(timestampSeries, avgLatencySeries, 'b', label = 'avg. latency')
 ax1.plot(timestampSeries, maxLatencySeries, 'r', label = 'max. latency')
