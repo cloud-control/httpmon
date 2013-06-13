@@ -80,14 +80,52 @@ bool processMessage(int s,
 	return true;
 }
 
-bool rebalancePlatform(VirtualManager &vmm, std::map<std::string, double> &vmToPerformance)
+bool rebalancePlatform(VirtualManager &vmm,
+	double platformSize,
+	double epsilonRm,
+	std::map<std::string, double> &vmToPerformance,
+	std::map<std::string, double> &vmToCap)
 {
 	fprintf(stderr, "Rebalancing platform\n");
 
 	std::vector<std::string> vms = vmm.listVms();
+	vms.erase(vms.begin()); /* leave Dom-0 alone */
+
+	/* Compute sum of matching values */
+	double sumFik = 0;
+	for (auto vm : vms)
+		sumFik += vmToPerformance[vm]; /* zero if vm is not in map, i.e., SL-unaware */
+
+	/* Update caps */
+	int numNewVms = 0;
 	for (auto vm : vms) {
-		fprintf(stderr, "- %s: %f\n", vm.c_str(), vmToPerformance[vm]);
+		if (vmToCap[vm] == 0) /* new VM */ {
+			numNewVms++;
+			fprintf(stderr, "- %s: new\n", vm.c_str());
+		}
+		else
+			vmToCap[vm] -= epsilonRm * (vmToPerformance[vm] - vmToCap[vm] * sumFik);
 	}
+
+	/* Deal with new VMs */
+	for (auto vm : vms) {
+		if (vmToCap[vm] == 0) /* new VM */
+			vmToCap[vm] = 1.0 / vms.size();
+		else
+			vmToCap[vm] *= 1.0 * (vms.size() - numNewVms) / vms.size();
+	}
+
+	/* Apply new caps and report outcome*/
+	for (auto vm : vms) {
+		double cap = vmToCap[vm] * platformSize;
+		fprintf(stderr, "- %s: perf=%f orig_cap=%f cap=%f\n",
+			vm.c_str(),
+			vmToPerformance[vm],
+			vmToCap[vm],
+			cap);
+		vmm.setVmCap(vm, vmToCap[vm] * platformSize); /* XXX: We might want to avoid useless changes here */
+	}
+
 	return false;
 }
 
@@ -96,6 +134,11 @@ int main(int argc, char **argv)
 	/* Set up some passive data structures */
 	std::map<uint32_t, std::string> ipToVmCache;
 	std::map<std::string, double> vmToPerformance;
+	std::map<std::string, double> vmToCap;
+	double epsilonRm = 0.01;
+	double platformSize = 400;
+
+	/* TODO: parse command-line for epsilonRm, control interval and platform size */
 
 	/* Class to chat with hypervisor */
 	VirtualManager vmm;
@@ -136,7 +179,7 @@ int main(int argc, char **argv)
 
 		/* Should we run the controller? If so, run it. */
 		if (now() - lastControl > CONTROL_INTERVAL) {
-			rebalancePlatform(vmm, vmToPerformance);
+			rebalancePlatform(vmm, platformSize, epsilonRm, vmToPerformance, vmToCap);
 			lastControl = now();
 		}
 	}
