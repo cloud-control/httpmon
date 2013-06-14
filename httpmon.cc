@@ -106,11 +106,18 @@ int httpClientMain(int id, HttpClientControl &control)
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &optionalStuff);
 
 	std::default_random_engine rng; /* random number generator */
+	double lastThinkTime = control.thinkTime;
 	std::exponential_distribution<double> waitDistribution(1 / control.thinkTime);
 
 	rng.seed(now() + id);
 
 	while (control.running) {
+		/* Check to see if paramaters have changed and update distribution */
+		if (lastThinkTime != control.thinkTime) {
+			lastThinkTime = control.thinkTime;
+			waitDistribution = std::exponential_distribution<double>(1 / control.thinkTime);
+		}
+
 		/* Send HTTP request */
 		double start = now();
 		optionalStuff = 0;
