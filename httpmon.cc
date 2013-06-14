@@ -345,10 +345,10 @@ int main(int argc, char **argv)
 		processInput(prevInput, control);
 
 		/* Check if requested concurrency increased */
-		while (httpClientThreads.size() < control.concurrency)
-			httpClientThreads.push_back(boost::thread(httpClientMain, i, std::ref(control)));
+		while ((int)httpClientThreads.size() < control.concurrency)
+			httpClientThreads.push_back(boost::thread(httpClientMain, httpClientThreads.size(), std::ref(control)));
 		/* Check if requested concurrency decreased */
-		while (httpClientThreads.size() > control.concurrency) {
+		while ((int)httpClientThreads.size() > control.concurrency) {
 			httpClientThreads.back().interrupt();
 			httpClientThreads.back().join();
 			httpClientThreads.pop_back();
