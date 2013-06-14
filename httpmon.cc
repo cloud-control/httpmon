@@ -138,6 +138,50 @@ int httpClientMain(int id, HttpClientControl &control)
 	return 0;
 }
 
+void report(HttpClientControl &control, double &lastReportTime, int &totalRequests)
+{
+	/* Atomically retrieve relevant data */
+	int numErrors;
+	int numOptionalStuff1;
+	int numOptionalStuff2;
+	std::vector<double> latencies;
+	double reportTime;
+	{
+		std::lock_guard<std::mutex> lock(control.mutex);
+
+		numErrors = control.numErrors;
+		numOptionalStuff1 = control.numOptionalStuff1;
+		numOptionalStuff2 = control.numOptionalStuff2;
+		latencies = control.latencies;
+
+		control.numErrors = 0;
+		control.numOptionalStuff1 = 0;
+		control.numOptionalStuff2 = 0;
+		control.latencies.clear();
+		reportTime = now();
+	}
+
+	double throughput = (double)latencies.size() / (reportTime - lastReportTime);
+	double recommendationRate = (double)numOptionalStuff1 / latencies.size();
+	double commentRate = (double)numOptionalStuff2 / latencies.size();
+	auto latencyQuartiles = quartiles(latencies);
+	lastReportTime = reportTime;
+	totalRequests += latencies.size();
+
+	fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms throughput=%.0frps rr=%.2f%% cr=%.2f%% errors=%d total=%d\n",
+		reportTime,
+		latencyQuartiles[0] * 1000,
+		latencyQuartiles[1] * 1000,
+		latencyQuartiles[2] * 1000,
+		latencyQuartiles[3] * 1000,
+		latencyQuartiles[4] * 1000,
+		average(latencies) * 1000,
+		throughput,
+		recommendationRate * 100,
+		commentRate * 100,
+		numErrors, totalRequests);
+}
+
 int main(int argc, char **argv)
 {
 	namespace po = boost::program_options;
@@ -221,45 +265,7 @@ int main(int argc, char **argv)
 		if (signo > 0)
 			control.running = false;
 
-		int numErrors;
-		int numOptionalStuff1;
-		int numOptionalStuff2;
-		std::vector<double> latencies;
-		double reportTime;
-		{
-			std::lock_guard<std::mutex> lock(control.mutex);
-
-			numErrors = control.numErrors;
-			numOptionalStuff1 = control.numOptionalStuff1;
-			numOptionalStuff2 = control.numOptionalStuff2;
-			latencies = control.latencies;
-
-			control.numErrors = 0;
-			control.numOptionalStuff1 = 0;
-			control.numOptionalStuff2 = 0;
-			control.latencies.clear();
-			reportTime = now();
-		}
-
-		double throughput = (double)latencies.size() / (reportTime - lastReportTime);
-		double recommendationRate = (double)numOptionalStuff1 / latencies.size();
-		double commentRate = (double)numOptionalStuff2 / latencies.size();
-		auto latencyQuartiles = quartiles(latencies);
-		lastReportTime = reportTime;
-		totalRequests += latencies.size();
-
-		fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms throughput=%.0frps rr=%.2f%% cr=%.2f%% errors=%d total=%d\n",
-			reportTime,
-			latencyQuartiles[0] * 1000,
-			latencyQuartiles[1] * 1000,
-			latencyQuartiles[2] * 1000,
-			latencyQuartiles[3] * 1000,
-			latencyQuartiles[4] * 1000,
-			average(latencies) * 1000,
-			throughput,
-			recommendationRate * 100,
-			commentRate * 100,
-			numErrors, totalRequests);
+		report(control, lastReportTime, totalRequests);
 	}
 	fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
 
@@ -272,48 +278,7 @@ int main(int argc, char **argv)
 	curl_global_cleanup();
 
 	/* Final stats */
-	/* XXX: de-duplicate code */
-	{
-		int numErrors;
-		int numOptionalStuff1;
-		int numOptionalStuff2;
-		std::vector<double> latencies;
-		double reportTime;
-		{
-			std::lock_guard<std::mutex> lock(control.mutex);
-
-			numErrors = control.numErrors;
-			numOptionalStuff1 = control.numOptionalStuff1;
-			numOptionalStuff2 = control.numOptionalStuff2;
-			latencies = control.latencies;
-
-			control.numErrors = 0;
-			control.numOptionalStuff1 = 0;
-			control.numOptionalStuff2 = 0;
-			control.latencies.clear();
-			reportTime = now();
-		}
-
-		double throughput = (double)latencies.size() / (reportTime - lastReportTime);
-		double recommendationRate = (double)numOptionalStuff1 / latencies.size();
-		double commentRate = (double)numOptionalStuff2 / latencies.size();
-		auto latencyQuartiles = quartiles(latencies);
-		lastReportTime = reportTime;
-		totalRequests += latencies.size();
-
-		fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms throughput=%.0frps rr=%.2f%% cr=%.2f%% errors=%d total=%d\n",
-			reportTime,
-			latencyQuartiles[0] * 1000,
-			latencyQuartiles[1] * 1000,
-			latencyQuartiles[2] * 1000,
-			latencyQuartiles[3] * 1000,
-			latencyQuartiles[4] * 1000,
-			average(latencies) * 1000,
-			throughput,
-			recommendationRate * 100,
-			commentRate * 100,
-			numErrors, totalRequests);
-	}
+	report(control, lastReportTime, totalRequests);
 
 	return 0;
 }
