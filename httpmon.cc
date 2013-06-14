@@ -308,9 +308,9 @@ int main(int argc, char **argv)
 	control.numOptionalStuff2 = 0;
 
 	/* Start client threads */
-	boost::thread httpClientThreads[concurrency];
+	std::vector<boost::thread> httpClientThreads;
 	for (int i = 0; i < concurrency; i++) {
-		httpClientThreads[i] = boost::thread(httpClientMain, i, std::ref(control));
+		httpClientThreads.push_back(boost::thread(httpClientMain, i, std::ref(control)));
 	}
 
 	/*
@@ -349,11 +349,11 @@ int main(int argc, char **argv)
 	/*
 	 * Cleanup
 	 */
-	for (int i = 0; i < concurrency; i++) {
-		httpClientThreads[i].interrupt();
+	for (auto &thread : httpClientThreads) {
+		thread.interrupt();
 	}
-	for (int i = 0; i < concurrency; i++) {
-		httpClientThreads[i].join();
+	for (auto &thread : httpClientThreads) {
+		thread.join();
 	}
 	curl_global_cleanup();
 
