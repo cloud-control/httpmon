@@ -343,6 +343,16 @@ int main(int argc, char **argv)
 
 		report(control, lastReportTime, totalRequests);
 		processInput(prevInput, control);
+
+		/* Check if requested concurrency increased */
+		while (httpClientThreads.size() < control.concurrency)
+			httpClientThreads.push_back(boost::thread(httpClientMain, i, std::ref(control)));
+		/* Check if requested concurrency decreased */
+		while (httpClientThreads.size() > control.concurrency) {
+			httpClientThreads.back().interrupt();
+			httpClientThreads.back().join();
+			httpClientThreads.pop_back();
+		}
 	}
 	fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
 
