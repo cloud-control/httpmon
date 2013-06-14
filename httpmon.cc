@@ -1,9 +1,12 @@
 #include <algorithm>
 #include <array>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 #include <curl/curl.h>
+#include <fcntl.h>
 #include <mutex>
 #include <poll.h>
 #include <random>
@@ -188,6 +191,55 @@ void report(HttpClientControl &control, double &lastReportTime, int &totalReques
 		numErrors, totalRequests);
 }
 
+void processInput(std::string &input, HttpClientControl &control)
+{
+	/* Store last size */
+	size_t prevInputSize = input.size();
+
+	/* Read new input */
+	char buf[1024];
+	ssize_t len;
+	while ((len = read(0, buf, sizeof(buf))) > 0)
+		input.append(buf, len);
+	if (input.size() == prevInputSize) /* no new data */
+		return;
+
+	/* Parse line by line */
+	for (;;) {
+		size_t newlineFound = input.find_first_of('\n', prevInputSize);
+		if (newlineFound == std::string::npos) {
+			/* newline not found */
+			return;
+		}
+		std::string line = input.substr(0, newlineFound);
+		input.erase(0, newlineFound + 1);
+
+		/* Tokenize input */
+		using namespace boost::algorithm;
+		std::vector<std::string> tokens;
+		split(tokens, line, is_any_of(" \n"), token_compress_on);
+
+		/* Parse key values */
+		for (auto it = tokens.begin(); it != tokens.end(); it++) {
+			std::vector<std::string> keyvalue;
+			split(keyvalue, *it, is_any_of("="), token_compress_on);
+			if (keyvalue.size() != 2) {
+				fprintf(stderr, "[%f] cannot parse key-value '%s'\n", now(), it->c_str());
+				continue; /* next input token */
+			}
+			std::string key = keyvalue[0];
+			std::string value = keyvalue[1];
+
+			if (key == "thinktime") {
+				control.thinkTime = atof(value.c_str());
+				fprintf(stderr, "[%f] set thinktime=%f\n", now(), control.thinkTime);
+			}
+			else
+				fprintf(stderr, "[%f] unknown key '%s'\n", now(), key.c_str());
+		}
+	}
+}
+
 int main(int argc, char **argv)
 {
 	namespace po = boost::program_options;
@@ -260,10 +312,16 @@ int main(int argc, char **argv)
 	sigaddset(&sigset, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &sigset, NULL);
 
+	/* Make stdin non-blocking */
+	int flags = fcntl(0, F_GETFL);
+	flags |= O_NONBLOCK;
+	fcntl(0, F_SETFL, flags);
+
 	/* Report at regular intervals */
 	int signo;
 	double lastReportTime = now();
 	int totalRequests = 0;
+	std::string prevInput;
 	while (control.running) {
 		struct timespec timeout = { int(interval), int((interval-(int)interval) * NanoSecondsInASecond)};
 		signo = sigtimedwait(&sigset, NULL, &timeout);
@@ -272,6 +330,7 @@ int main(int argc, char **argv)
 			control.running = false;
 
 		report(control, lastReportTime, totalRequests);
+		processInput(prevInput, control);
 	}
 	fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
 
