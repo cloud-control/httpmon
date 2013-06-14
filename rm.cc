@@ -72,7 +72,7 @@ bool processMessage(int s,
 		ipToVmCache[sin.sin_addr.s_addr] = vmName;
 	}
 
-	fprintf(stderr, "Got message from %s(%s): %s\n", inet_ntoa(sin.sin_addr), vmName.c_str(), buf);
+	fprintf(stderr, "[%f] got message from %s(%s): %s\n", now(), inet_ntoa(sin.sin_addr), vmName.c_str(), buf);
 
 	/* Store performance data */
 	vmToPerformance[vmName] = atof(buf);
@@ -86,7 +86,7 @@ bool rebalancePlatform(VirtualManager &vmm,
 	std::map<std::string, double> &vmToPerformance,
 	std::map<std::string, double> &vmToCap)
 {
-	fprintf(stderr, "Rebalancing platform\n");
+	fprintf(stderr, "[%f] rebalancing platform\n", now());
 
 	std::vector<std::string> vms = vmm.listVms();
 	vms.erase(vms.begin()); /* leave Dom-0 alone */
@@ -101,7 +101,7 @@ bool rebalancePlatform(VirtualManager &vmm,
 	for (auto vm : vms) {
 		if (vmToCap[vm] == 0) /* new VM */ {
 			numNewVms++;
-			fprintf(stderr, "- %s: new\n", vm.c_str());
+			fprintf(stderr, "[%f] - %s: new\n", now(), vm.c_str());
 		}
 		else
 			vmToCap[vm] -= epsilonRm * (vmToPerformance[vm] - vmToCap[vm] * sumFik);
@@ -118,7 +118,8 @@ bool rebalancePlatform(VirtualManager &vmm,
 	/* Apply new caps and report outcome*/
 	for (auto vm : vms) {
 		double cap = vmToCap[vm] * platformSize;
-		fprintf(stderr, "- %s: perf=%f orig_cap=%f cap=%f\n",
+		fprintf(stderr, "[%f] - %s: perf=%f orig_cap=%f cap=%f\n",
+			now(),
 			vm.c_str(),
 			vmToPerformance[vm],
 			vmToCap[vm],
