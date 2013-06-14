@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <array>
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <boost/program_options.hpp>
+#include <boost/thread.hpp>
 #include <curl/curl.h>
 #include <mutex>
 #include <poll.h>
@@ -14,6 +16,7 @@
 
 const int OptionalStuffMarker1 = 128;
 const int OptionalStuffMarker2 = 129;
+const long MicroSecondsInASecond = 1000000;
 const long NanoSecondsInASecond = 1000000000;
 
 typedef struct {
@@ -129,8 +132,11 @@ int httpClientMain(int id, HttpClientControl &control)
 			usleep(0);
 
 		if (control.thinkTime > 0) {
+			using boost::this_thread::sleep;
+			using boost::posix_time::microsec;
+
 			double wait = waitDistribution(rng);
-			usleep(wait * 1000000);
+			sleep(microsec(wait * MicroSecondsInASecond));
 		}
 	}
 	curl_easy_cleanup(curl);
@@ -238,9 +244,9 @@ int main(int argc, char **argv)
 	control.numOptionalStuff2 = 0;
 
 	/* Start client threads */
-	std::thread httpClientThreads[concurrency];
+	boost::thread httpClientThreads[concurrency];
 	for (int i = 0; i < concurrency; i++) {
-		httpClientThreads[i] = std::thread(httpClientMain, i, std::ref(control));
+		httpClientThreads[i] = boost::thread(httpClientMain, i, std::ref(control));
 	}
 
 	/*
@@ -272,6 +278,9 @@ int main(int argc, char **argv)
 	/*
 	 * Cleanup
 	 */
+	for (int i = 0; i < concurrency; i++) {
+		httpClientThreads[i].interrupt();
+	}
 	for (int i = 0; i < concurrency; i++) {
 		httpClientThreads[i].join();
 	}
