@@ -191,7 +191,6 @@ int main(int argc, char **argv)
 		int ret = 0; /* as if poll() had timed out */
 		struct pollfd fds[1] = {{ s, POLLIN }};
 		int waitForMs = (controlInterval - (now() - lastControl)) * 1000 + 1;
-		fprintf(stderr, "Waiting for %dms\n", waitForMs);
 		if (waitForMs > 0)
 			ret = poll(fds, 1, waitForMs);
 		if (ret == -1) /* why would this ever happen? */
