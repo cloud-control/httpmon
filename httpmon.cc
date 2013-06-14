@@ -32,6 +32,7 @@ typedef struct {
 	uint32_t numOptionalStuff1;
 	uint32_t numOptionalStuff2;
 	std::vector<double> latencies;
+	int concurrency;
 } HttpClientControl;
 
 double inline now()
@@ -240,6 +241,10 @@ void processInput(std::string &input, HttpClientControl &control)
 			if (key == "thinktime") {
 				control.thinkTime = atof(value.c_str());
 				fprintf(stderr, "[%f] set thinktime=%f\n", now(), control.thinkTime);
+			}
+			else if (key == "concurrency") {
+				control.concurrency = atoi(value.c_str());
+				fprintf(stderr, "[%f] set concurrency=%d\n", now(), control.concurrency);
 			}
 			else
 				fprintf(stderr, "[%f] unknown key '%s'\n", now(), key.c_str());
