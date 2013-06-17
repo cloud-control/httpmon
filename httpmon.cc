@@ -118,6 +118,18 @@ int httpClientMain(int id, HttpClientControl &control)
 			lastThinkTime = control.thinkTime;
 			waitDistribution = std::exponential_distribution<double>(1 / control.thinkTime);
 		}
+		
+		/* Simulate think-time */
+		/* We make sure that we first wait, then initiate the first connection
+		 * to avoid spiky transient effects */ 
+		if (control.thinkTime > 0) {
+			using boost::this_thread::sleep;
+			using boost::posix_time::microsec;
+
+			double wait = waitDistribution(rng);
+			sleep(microsec(wait * MicroSecondsInASecond));
+		}
+
 
 		/* Send HTTP request */
 		double start = now();
@@ -141,14 +153,6 @@ int httpClientMain(int id, HttpClientControl &control)
 		/* If an error has occured, we might spin and lock "control" */
 		if (error)
 			usleep(0);
-
-		if (control.thinkTime > 0) {
-			using boost::this_thread::sleep;
-			using boost::posix_time::microsec;
-
-			double wait = waitDistribution(rng);
-			sleep(microsec(wait * MicroSecondsInASecond));
-		}
 	}
 	curl_easy_cleanup(curl);
 
