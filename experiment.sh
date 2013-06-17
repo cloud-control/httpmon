@@ -89,14 +89,14 @@ sleep 100
 
 # stop experiment log channel
 kill $expLogPid
-wait $expLogPid
+wait $expLogPid || true
 
 # stop http client
 kill $httpmonPid
-wait $httpmonPid
+wait $httpmonPid || true
 
 # stop local controller and copy results
 kill $lcPid
-wait $lcPid
+wait $lcPid || true
 
 # done
