@@ -1,0 +1,35 @@
+Currently running VMs
+2013-06-17 19:02:03.151+0000: 27434: info : libvirt version: 0.9.8
+2013-06-17 19:02:03.151+0000: 27434: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=0 vcpus=4 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=400 vcpus=4 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=400 vcpus=4
+Currently running VMs
+2013-06-17 19:03:54.074+0000: 27586: info : libvirt version: 0.9.8
+2013-06-17 19:03:54.074+0000: 27586: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=0 vcpus=4 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=400 vcpus=4 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=200 vcpus=2
+Currently running VMs
+2013-06-17 19:05:34.980+0000: 27637: info : libvirt version: 0.9.8
+2013-06-17 19:05:34.980+0000: 27637: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=0 vcpus=4 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=200 vcpus=2 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=50 vcpus=1
+Currently running VMs
+2013-06-17 19:07:15.875+0000: 27685: info : libvirt version: 0.9.8
+2013-06-17 19:07:15.875+0000: 27685: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=0 vcpus=4 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=50 vcpus=1 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=300 vcpus=3
+Currently running VMs
+2013-06-17 19:08:56.757+0000: 27733: info : libvirt version: 0.9.8
+2013-06-17 19:08:56.757+0000: 27733: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=0 vcpus=4 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=300 vcpus=3 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=100 vcpus=1

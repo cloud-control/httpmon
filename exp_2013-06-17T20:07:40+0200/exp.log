@@ -1,0 +1,8 @@
+[1371492462] cap=400
+[1371492473] start
+[1371492473] thinktime=3
+[1371492473] concurrency=100
+[1371492573] concurrency=400
+[1371492673] concurrency=200
+[1371492773] concurrency=800
+[1371492873] concurrency=50
