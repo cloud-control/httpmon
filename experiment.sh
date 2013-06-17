@@ -5,7 +5,7 @@ vm=rubis-hvm
 pole=0
 httpmon=./httpmon
 actuator=./actuator
-lc=./rubis/PHP/localController.php
+lc=./rubis/PHP/localController.py
 url="http://rubis-hvm/PHP/RandomItem.php"
 
 # Helper functions
