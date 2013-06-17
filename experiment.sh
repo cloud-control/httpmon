@@ -22,7 +22,6 @@ function setConcurrency {
 }
 function setStart {
 	echo [`date +%s`] start >&8
-	echo "start" >&9
 }
 
 #
