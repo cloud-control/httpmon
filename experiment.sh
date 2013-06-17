@@ -2,7 +2,7 @@
 
 # Settings
 vm=rubis-hvm
-pole=0.5
+pole=0
 httpmon=./httpmon
 actuator=./actuator
 url="http://rubis-hvm/PHP/RandomItem.php"
@@ -22,7 +22,6 @@ function setConcurrency {
 }
 function setStart {
 	echo [`date +%s`] start >&8
-	echo "start" >&9
 }
 
 #
@@ -52,7 +51,7 @@ lcPid=$!
 
 # start (but do not activate) http client
 mkfifo httpmon.fifo
-$httpmon --url $url --concurrency 0  < httpmon.fifo &> httpmon.log &
+$httpmon --url $url --concurrency 0 --timeout 10 < httpmon.fifo &> httpmon.log &
 httpmonPid=$!
 exec 9> httpmon.fifo
 
@@ -73,19 +72,13 @@ setStart
 setThinkTime 3
 setConcurrency 100
 sleep 100
-setCap 200
+setConcurrency 400
 sleep 100
-setCap  50
+setConcurrency 200
 sleep 100
-setCap 300
+setConcurrency 800
 sleep 100
-setCap 100
-sleep 100
-setCap 200
-sleep 100
-setCap  50
-sleep 100
-setCap 400
+setConcurrency 50
 sleep 100
 
 # stop experiment log channel
