@@ -49,7 +49,7 @@ for line in lcLogLines:
 # Get experiment start
 for line in expLogLines:
 	try:
-		timestamp = float(re.search("\[([0-9.]+)\]", line).group(1))
+		timestamp = float(re.search("\[([0-9.]+)\] start", line).group(1))
 		tStart = int(timestamp)
 		break
 	except AttributeError:
