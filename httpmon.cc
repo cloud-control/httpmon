@@ -355,7 +355,7 @@ int main(int argc, char **argv)
 		/* Check if requested concurrency decreased */
 		while ((int)httpClientThreads.size() > control.concurrency) {
 			httpClientThreads.back().interrupt();
-			httpClientThreads.back().join();
+			httpClientThreads.back().detach();
 			httpClientThreads.pop_back();
 		}
 	}
