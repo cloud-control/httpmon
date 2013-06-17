@@ -306,6 +306,7 @@ int main(int argc, char **argv)
 	control.numErrors = 0;
 	control.numOptionalStuff1 = 0;
 	control.numOptionalStuff2 = 0;
+	control.concurrency = concurrency;
 
 	/* Start client threads */
 	std::vector<boost::thread> httpClientThreads;
