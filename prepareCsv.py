@@ -32,8 +32,6 @@ for line in clientLogLines:
 		rr = float(re.search("rr=([0-9.]+)", line).group(1))
 		tRubis[int(timestamp)] = maxLatency
 	except AttributeError:
-		print(line)
-		raise
 		pass
 
 for line in lcLogLines:
@@ -42,8 +40,6 @@ for line in lcLogLines:
 		rr = float(re.search("rr=([0-9.]+)", line).group(1))
 		sRubis[int(timestamp)] = rr
 	except AttributeError:
-		print(line)
-		raise
 		pass
 
 # Get experiment start
@@ -53,8 +49,6 @@ for line in expLogLines:
 		tStart = int(timestamp)
 		break
 	except AttributeError:
-		print(line)
-		raise
 		pass
 
 # Get experiment end
