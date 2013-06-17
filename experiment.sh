@@ -44,10 +44,10 @@ cd $resultsdir
 
 # make sure environment is clean
 pkill -f httpmon || true
-ssh rubis-hvm "pkill -f localController.py" || true
+ssh $vm "pkill -f localController.py" || true
 
 # start local controller
-ssh rubis-hvm "$lc --pole $pole" &> lc.log &
+ssh $vm "$lc --pole $pole" &> lc.log &
 lcPid=$!
 
 # start (but do not activate) http client
