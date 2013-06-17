@@ -5,6 +5,7 @@ vm=rubis-hvm
 pole=0
 httpmon=./httpmon
 actuator=./actuator
+lc=./rubis/PHP/localController.php
 url="http://rubis-hvm/PHP/RandomItem.php"
 
 # Helper functions
@@ -46,7 +47,7 @@ pkill -f httpmon || true
 ssh rubis-hvm "pkill -f localController.py" || true
 
 # start local controller
-ssh rubis-hvm "./rubis/PHP/localController.py --pole $pole" &> lc.log &
+ssh rubis-hvm "$lc --pole $pole" &> lc.log &
 lcPid=$!
 
 # start (but do not activate) http client
