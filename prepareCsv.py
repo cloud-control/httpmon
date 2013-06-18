@@ -13,6 +13,8 @@ from sys import argv, stdin, stderr
 #
 # Helper functions
 #
+def avg(a):
+	return sum(a) / len(a)
 def inExpDir(f):
 	global options
 	return os.path.join(options.directory, f)
@@ -25,6 +27,11 @@ parser.add_option("-d", "--directory",
 	metavar = "DIR",
 	help = "look for experiment data in DIR (default: %default)",
 	default = os.getcwd())
+parser.add_option("-i", "--interval",
+	metavar = "INTERVAL",
+	help = "aggregate data over INTERVAL seconds (default: %default)",
+	type = int,
+	default = 1)
 (options, args) = parser.parse_args()
 
 #
@@ -50,13 +57,6 @@ for line in clientLogLines:
 		maxLatency = float(re.search("latency=[0-9.]+:[0-9.]+:[0-9.]+:[0-9.]+:([0-9.]+):\([0-9.]+\)", line).group(1))
 		rr = float(re.search("rr=([0-9.]+)", line).group(1))
 		tRubis[int(timestamp)] = maxLatency
-	except AttributeError:
-		pass
-
-for line in lcLogLines:
-	try:
-		timestamp = float(re.search("([0-9.]+)", line).group(1))
-		rr = float(re.search("rr=([0-9.]+)", line).group(1))
 		sRubis[int(timestamp)] = rr
 	except AttributeError:
 		pass
@@ -77,8 +77,18 @@ tEnd = min(max(tRubis), max(sRubis))
 # Output results
 #
 print("# Generated using: " + ' '.join(argv))
-for time in range(tStart, tEnd):
-	try:
-		print(time-tStart, tRubis[time] / 1000, sRubis[time] / 100, sep = ',')
-	except KeyError:
-		print("Missing data for absolute time {0}, relative time {1}".format(time, time-tStart), file = stderr)
+
+aggregateInterval = options.interval
+for time in range(tStart, tEnd, aggregateInterval):
+	latencies = []
+	serviceLevels = []
+	for t in range(time, time + aggregateInterval):
+		try:
+			latencies.append(tRubis[t])
+			serviceLevels.append(sRubis[t])
+		except KeyError:
+			print("Missing data for absolute time {0}, relative time {1}".format(t, t-tStart), file = stderr)
+			continue
+	if len(latencies) == 0: continue
+	if len(serviceLevels) == 0: continue
+	print(time-tStart, max(latencies) / 1000, avg(serviceLevels) / 100, sep = ',')
