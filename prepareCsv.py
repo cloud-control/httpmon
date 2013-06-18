@@ -4,7 +4,7 @@ from __future__ import print_function
 from optparse import OptionParser
 import os
 import re
-from sys import stdin, stderr
+from sys import argv, stdin, stderr
 
 # Reads experiment files from current directory (as dumped by do_stuff)
 # and outputs results to stdout in the following CSV format:
@@ -76,6 +76,7 @@ tEnd = min(max(tRubis), max(sRubis))
 #
 # Output results
 #
+print("# Generated using: " + ' '.join(argv))
 for time in range(tStart, tEnd):
 	try:
 		print(time-tStart, tRubis[time] / 1000, sRubis[time] / 100, sep = ',')
