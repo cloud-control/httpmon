@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from __future__ import print_function
 
+from optparse import OptionParser
+import os
 import re
 from sys import stdin, stderr
 
@@ -9,11 +11,28 @@ from sys import stdin, stderr
 # TIME, T_RUBIS, S_RUBIS
 
 #
+# Helper functions
+#
+def inExpDir(f):
+	global options
+	return os.path.join(options.directory, f)
+
+#
+# Process command-line
+#
+parser = OptionParser()
+parser.add_option("-d", "--directory",
+	metavar = "DIR",
+	help = "look for experiment data in DIR (default: %default)",
+	default = os.getcwd())
+(options, args) = parser.parse_args()
+
+#
 # Read all input files
 #
-expLogLines = open('exp.log').readlines()
-clientLogLines = open('httpmon.log').readlines()
-lcLogLines = open('lc.log').readlines()
+expLogLines = open(inExpDir('exp.log')).readlines()
+clientLogLines = open(inExpDir('httpmon.log')).readlines()
+lcLogLines = open(inExpDir('lc.log')).readlines()
 
 #
 # Process lines
