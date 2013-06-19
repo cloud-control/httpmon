@@ -4,7 +4,7 @@ from __future__ import print_function
 from optparse import OptionParser
 import os
 import re
-from sys import argv, stdin, stderr
+from sys import argv, stdin, stdout, stderr
 
 # Reads experiment files from current directory (as dumped by do_stuff)
 # and outputs results to stdout in the following CSV format:
@@ -32,6 +32,9 @@ parser.add_option("-i", "--interval",
 	help = "aggregate data over INTERVAL seconds (default: %default)",
 	type = int,
 	default = 1)
+parser.add_option("-o", "--output",
+	metavar = "OUTPUT",
+	help = "output file (default: stdout)")
 (options, args) = parser.parse_args()
 
 #
@@ -76,7 +79,11 @@ tEnd = min(max(tRubis), max(sRubis))
 #
 # Output results
 #
-print("# Generated using: " + ' '.join(argv))
+if options.output is None:
+	f = stdout
+else:
+	f = open(options.output, 'w')
+print("# Generated using: " + ' '.join(argv), file = f)
 
 aggregateInterval = options.interval
 for time in range(tStart, tEnd, aggregateInterval):
@@ -91,4 +98,4 @@ for time in range(tStart, tEnd, aggregateInterval):
 			continue
 	if len(latencies) == 0: continue
 	if len(serviceLevels) == 0: continue
-	print(time-tStart, max(latencies) / 1000, avg(serviceLevels) / 100, sep = ',')
+	print(time-tStart, max(latencies) / 1000, avg(serviceLevels) / 100, sep = ',', file = f)
