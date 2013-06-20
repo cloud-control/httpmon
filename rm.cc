@@ -205,6 +205,8 @@ int main(int argc, char **argv)
 		if (now() - lastControl > controlInterval) {
 			rebalancePlatform(vmm, 100 * nCpus, epsilonRm, vmToPerformance, vmToCap);
 			lastControl = now();
+			/* Require VMs to report performance before next control interval */
+			vmToPerformance.clear();
 		}
 	}
 }
