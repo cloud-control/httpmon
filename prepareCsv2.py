@@ -145,7 +145,7 @@ for line in expLogLines:
 		break
 	except AttributeError:
 		pass
-tEnd = max(timeseries.iterkeys())
+tEnd = tStart + 600 #max(timeseries.iterkeys())
 
 #
 # Output results
@@ -160,8 +160,12 @@ for t in range(tStart, tEnd):
 	try:
 		print( \
 			t - tStart,
+			timeseries[t]["rubis"],
+			timeseries[t]["rubbos"],
+			timeseries[t]["rubis_perf"],
+			timeseries[t]["rubbos_perf"],
 			timeseries[t]["rubis_serviceLevel"],
-
+			timeseries[t]["rubbos_serviceLevel"],
 			sep = ',', file = f
 		)
 	except KeyError:
