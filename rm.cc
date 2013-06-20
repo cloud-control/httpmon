@@ -72,7 +72,7 @@ bool processMessage(int s,
 		ipToVmCache[sin.sin_addr.s_addr] = vmName;
 	}
 
-	fprintf(stderr, "[%f] got message from %s(%s): %s\n", now(), inet_ntoa(sin.sin_addr), vmName.c_str(), buf);
+	//fprintf(stderr, "[%f] got message from %s(%s): %s\n", now(), inet_ntoa(sin.sin_addr), vmName.c_str(), buf);
 
 	/* Store performance data */
 	vmToPerformance[vmName] = atof(buf);
@@ -84,10 +84,8 @@ bool rebalancePlatform(VirtualManager &vmm,
 	double platformSize,
 	double epsilonRm,
 	std::map<std::string, double> &vmToPerformance,
-	std::map<std::string, double> &vmToCap)
+	std::map<std::string, double> &vmToVp)
 {
-	fprintf(stderr, "[%f] rebalancing platform\n", now());
-
 	std::vector<std::string> vms = vmm.listVms();
 	vms.erase(vms.begin()); /* leave Dom-0 alone */
 
@@ -99,32 +97,40 @@ bool rebalancePlatform(VirtualManager &vmm,
 	/* Update caps */
 	int numNewVms = 0;
 	for (auto vm : vms) {
-		if (vmToCap[vm] == 0) /* new VM */ {
+		if (vmToVp[vm] == 0) /* new VM */ {
 			numNewVms++;
-			fprintf(stderr, "[%f] - %s: new\n", now(), vm.c_str());
+			fprintf(stderr, "[%f] vm=%s new\n", now(), vm.c_str());
 		}
 		else
-			vmToCap[vm] -= epsilonRm * (vmToPerformance[vm] - vmToCap[vm] * sumFik);
+			vmToVp[vm] -= epsilonRm * (vmToPerformance[vm] - vmToVp[vm] * sumFik);
 	}
 
 	/* Deal with new VMs */
 	for (auto vm : vms) {
-		if (vmToCap[vm] == 0) /* new VM */
-			vmToCap[vm] = 1.0 / vms.size();
+		if (vmToVp[vm] == 0) /* new VM */
+			vmToVp[vm] = 1.0 / vms.size();
 		else
-			vmToCap[vm] *= 1.0 * (vms.size() - numNewVms) / vms.size();
+			vmToVp[vm] *= 1.0 * (vms.size() - numNewVms) / vms.size();
+	}
+
+	/* Limit vp */
+	for (auto vm : vms) {
+		if (vmToVp[vm] < 0.01)
+			vmToVp[vm] = 0.01;
+		else if (vmToVp[vm] > 1)
+			vmToVp[vm] = 1;
 	}
 
 	/* Apply new caps and report outcome*/
 	for (auto vm : vms) {
-		double cap = vmToCap[vm] * platformSize;
-		fprintf(stderr, "[%f] - %s: perf=%f orig_cap=%f cap=%f\n",
+		double cap = vmToVp[vm] * platformSize;
+		fprintf(stderr, "[%f] vm=%s perf=%f vp=%f cap=%f\n",
 			now(),
 			vm.c_str(),
 			vmToPerformance[vm],
-			vmToCap[vm],
+			vmToVp[vm],
 			cap);
-		vmm.setVmCap(vm, vmToCap[vm] * platformSize); /* XXX: We might want to avoid useless changes here */
+		vmm.setVmCap(vm, cap); /* XXX: We might want to avoid useless changes here */
 	}
 
 	return false;
@@ -163,7 +169,7 @@ int main(int argc, char **argv)
 	/* Set up some passive data structures */
 	std::map<uint32_t, std::string> ipToVmCache;
 	std::map<std::string, double> vmToPerformance;
-	std::map<std::string, double> vmToCap;
+	std::map<std::string, double> vmToVp;
 
 	/* Class to chat with hypervisor */
 	VirtualManager vmm;
@@ -203,7 +209,7 @@ int main(int argc, char **argv)
 
 		/* Should we run the controller? If so, run it. */
 		if (now() - lastControl > controlInterval) {
-			rebalancePlatform(vmm, 100 * nCpus, epsilonRm, vmToPerformance, vmToCap);
+			rebalancePlatform(vmm, 100 * nCpus, epsilonRm, vmToPerformance, vmToVp);
 			lastControl = now();
 			/* Require VMs to report performance before next control interval */
 			vmToPerformance.clear();
