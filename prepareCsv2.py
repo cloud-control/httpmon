@@ -160,12 +160,12 @@ for t in range(tStart, tEnd):
 	try:
 		print( \
 			t - tStart,
-			timeseries[t]["rubis"],
-			timeseries[t]["rubbos"],
-			timeseries[t]["rubis_perf"],
-			timeseries[t]["rubbos_perf"],
-			timeseries[t]["rubis_serviceLevel"],
-			timeseries[t]["rubbos_serviceLevel"],
+			timeseries[t].get("rubis", '-'),
+			timeseries[t].get("rubbos", '-'),
+			timeseries[t].get("rubis_perf", '-'),
+			timeseries[t].get("rubbos_perf", '-'),
+			timeseries[t].get("rubis_serviceLevel", '-'),
+			timeseries[t].get("rubbos_serviceLevel", '-'),
 			sep = ',', file = f
 		)
 	except KeyError:
