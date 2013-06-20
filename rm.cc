@@ -115,6 +115,14 @@ bool rebalancePlatform(VirtualManager &vmm,
 			vmToVp[vm] *= 1.0 * (vms.size() - numNewVms) / vms.size();
 	}
 
+	/* Limit vp */
+	for (auto vm : vms) {
+		if (vmToVp[vm] < 0.01)
+			vmToVp[vm] = 0.01;
+		else if (vmToVp[vm] > 1)
+			vmToVp[vm] = 1;
+	}
+
 	/* Apply new caps and report outcome*/
 	for (auto vm : vms) {
 		double cap = vmToVp[vm] * platformSize;
