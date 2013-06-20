@@ -115,11 +115,16 @@ bool rebalancePlatform(VirtualManager &vmm,
 
 	/* Limit vp */
 	for (auto vm : vms) {
-		if (vmToVp[vm] < 0.01)
-			vmToVp[vm] = 0.01;
+		if (vmToVp[vm] < 0.125)
+			vmToVp[vm] = 0.125;
 		else if (vmToVp[vm] > 1)
 			vmToVp[vm] = 1;
 	}
+
+	/* Rescale to make sure the sum is 1 */
+	sumVp = 0;
+	for (auto vm : vms) sumVp += vmToVp[vm];
+	for (auto vm : vms) vmToVp[vm] /= sumVp; // XXX: Can sumVp ever be zero?
 
 	/* Apply new caps and report outcome*/
 	for (auto vm : vms) {
