@@ -63,7 +63,7 @@ pids="$pids $!"
 exec 12> httpmon2.fifo
 
 # start resource manager
-$resourceManager --epsilon 0.3 &> rm.log &
+$resourceManager --epsilon 0.03 &> rm.log &
 pids="$pids $!"
 
 # open log for experiment
@@ -81,11 +81,19 @@ sleep 10 # let system settle
 setStart
 setThinkTime 11 3
 setThinkTime 12 0.1
-setConcurrency 11 100
+# t=0
+setConcurrency 11 10
+setConcurrency 12 1
 sleep 200
-setConcurrency 12 100
-sleep 200
+# t=200
 setConcurrency 11 50
+sleep 200
+# t=400
+setConcurrency 11 50
+setConcurrency 12 50
+sleep 200
+# t=600
+setConcurrency 11 1
 sleep 200
 
 # stop experiment
