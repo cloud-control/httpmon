@@ -75,7 +75,7 @@ bool processMessage(int s,
 	//fprintf(stderr, "[%f] got message from %s(%s): %s\n", now(), inet_ntoa(sin.sin_addr), vmName.c_str(), buf);
 
 	/* Store performance data */
-	vmToPerformance[vmName] = atof(buf);
+	vmToPerformance[vmName] = std::max(std::min(atof(buf), 1.0), -1.0);
 
 	return true;
 }
@@ -101,7 +101,7 @@ bool rebalancePlatform(VirtualManager &vmm,
 			numNewVms++;
 			fprintf(stderr, "[%f] vm=%s new\n", now(), vm.c_str());
 		}
-		else
+		else if (vmToPerformance[vm] < 0)
 			vmToVp[vm] -= epsilonRm * (vmToPerformance[vm] - vmToVp[vm] * sumFik);
 	}
 
