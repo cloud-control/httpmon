@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import print_function
+from __future__ import print_function, division
 
 from optparse import OptionParser
 import os
@@ -20,6 +20,8 @@ def avg(a):
 def inExpDir(f):
 	global options
 	return os.path.join(options.directory, f)
+def saturate(v, minValue = -1, maxValue = +1):
+	return min(max(v, minValue), maxValue)
 
 def mergeIntoTimeSeries(mainSeries, series, prefix = '', suffix = ''):
 	for timestamp, keyvalues in series.iteritems():
@@ -54,8 +56,8 @@ def getClientTimeSeries(lines):
 			timestamp = int(timestamp)
 			if timestamp not in timeseries:
 				timeseries[timestamp] = {}
-			timeseries[timestamp]['latency'] = maxLatency
-			timeseries[timestamp]['serviceLevel'] = rr
+			timeseries[timestamp]['latency'] = maxLatency / 1000.0
+			timeseries[timestamp]['serviceLevel'] = rr / 100.0
 		except AttributeError:
 			print("Ignoring line:", line.strip(), file = stderr)
 			pass
@@ -72,7 +74,7 @@ def getLcTimeSeries(lines):
 			timestamp = int(timestamp)
 			if timestamp not in timeseries:
 				timeseries[timestamp] = {}
-			timeseries[timestamp]['serviceLevel'] = rr
+			timeseries[timestamp]['serviceLevel'] = rr / 100.0
 			timeseries[timestamp]['perf'] = perf
 		except AttributeError:
 			pass
@@ -156,16 +158,19 @@ else:
 	f = open(options.output, 'w')
 print("# Generated using: " + ' '.join(argv), file = f)
 
+print("rubis_cap rubbos_cap rubis_perf rubbos_perf rubis_sl rubbos_sl rubis_latency rubbos_latency")
 for t in range(tStart, tEnd):
 	try:
 		print( \
 			t - tStart,
-			timeseries[t].get("rubis", '-'),
-			timeseries[t].get("rubbos", '-'),
-			timeseries[t].get("rubis_perf", '-'),
-			timeseries[t].get("rubbos_perf", '-'),
-			timeseries[t].get("rubis_serviceLevel", '-'),
-			timeseries[t].get("rubbos_serviceLevel", '-'),
+			timeseries[t].get("rubis", 'nan'),
+			timeseries[t].get("rubbos", 'nan'),
+			saturate(timeseries[t].get("rubis_perf", 'nan')),
+			saturate(timeseries[t].get("rubbos_perf", 'nan')),
+			timeseries[t].get("rubis_serviceLevel", 'nan'),
+			timeseries[t].get("rubbos_serviceLevel", 'nan'),
+			timeseries[t].get("rubis_latency", 'nan'),
+			timeseries[t].get("rubbos_latency", 'nan'),
 			sep = ',', file = f
 		)
 	except KeyError:
