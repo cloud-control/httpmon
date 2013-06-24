@@ -23,6 +23,15 @@ def inExpDir(f):
 def saturate(v, minValue = -1, maxValue = +1):
 	return min(max(v, minValue), maxValue)
 
+def getAggregateValue(series, key, start, end, func):
+	values = []
+	for timestamp, keyvalues in series.iteritems():
+		assert(int(timestamp) == timestamp)
+		if timestamp < start: continue
+		if timestamp >= end: continue
+		values.append(keyvalues[key])
+	return func(values)
+
 def mergeIntoTimeSeries(mainSeries, series, prefix = '', suffix = ''):
 	for timestamp, keyvalues in series.iteritems():
 		assert(int(timestamp) == timestamp)
@@ -159,18 +168,18 @@ else:
 print("# Generated using: " + ' '.join(argv), file = f)
 
 print("rubis_cap rubbos_cap rubis_perf rubbos_perf rubis_sl rubbos_sl rubis_latency rubbos_latency")
-for t in range(tStart, tEnd):
+for t in range(tStart, tEnd, options.interval):
 	try:
 		print( \
 			t - tStart,
-			timeseries[t].get("rubis", 'nan'),
-			timeseries[t].get("rubbos", 'nan'),
-			saturate(timeseries[t].get("rubis_perf", 'nan')),
-			saturate(timeseries[t].get("rubbos_perf", 'nan')),
-			timeseries[t].get("rubis_serviceLevel", 'nan'),
-			timeseries[t].get("rubbos_serviceLevel", 'nan'),
-			timeseries[t].get("rubis_latency", 'nan'),
-			timeseries[t].get("rubbos_latency", 'nan'),
+			getAggregateValue(timeseries, "rubis", t, t+options.interval, avg),
+			getAggregateValue(timeseries, "rubbos", t, t+options.interval, avg),
+			saturate(getAggregateValue(timeseries, "rubis_perf", t, t+options.interval, min)),
+			saturate(getAggregateValue(timeseries, "rubbos_perf", t, t+options.interval, min)),
+			getAggregateValue(timeseries, "rubis_serviceLevel", t, t+options.interval, avg),
+			getAggregateValue(timeseries, "rubbos_serviceLevel", t, t+options.interval, avg),
+			getAggregateValue(timeseries, "rubis_latency", t, t+options.interval, max),
+			getAggregateValue(timeseries, "rubbos_latency", t, t+options.interval, max),
 			sep = ',', file = f
 		)
 	except KeyError:
