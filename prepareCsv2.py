@@ -145,7 +145,7 @@ for line in expLogLines:
 		break
 	except AttributeError:
 		pass
-tEnd = tStart + 600 #max(timeseries.iterkeys())
+tEnd = max(timeseries.iterkeys())
 
 #
 # Output results
