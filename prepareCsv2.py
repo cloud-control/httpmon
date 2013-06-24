@@ -50,7 +50,6 @@ def getClientTimeSeries(lines):
 			minLatency = float(re.search("latency=([0-9.]+):[0-9.]+:[0-9.]+:[0-9.]+:[0-9.]+:\([0-9.]+\)", line).group(1))
 			maxLatency = float(re.search("latency=[0-9.]+:[0-9.]+:[0-9.]+:[0-9.]+:([0-9.]+):\([0-9.]+\)", line).group(1))
 			rr = float(re.search("rr=([0-9.]+)", line).group(1))
-			perf = float(re.search("perf=([0-9.]+)", line).group(1))
 
 			timestamp = int(timestamp)
 			if timestamp not in timeseries:
@@ -58,6 +57,7 @@ def getClientTimeSeries(lines):
 			timeseries[timestamp]['latency'] = maxLatency
 			timeseries[timestamp]['serviceLevel'] = rr
 		except AttributeError:
+			print("Ignoring line:", line.strip(), file = stderr)
 			pass
 	return timeseries
 
