@@ -108,16 +108,16 @@ setConcurrency 13 10
 setConcurrency 14 10
 sleep 200
 # t=200
-setConcurrency 12 200
+setConcurrency 12 100
 sleep 200
 # t=400
-setConcurrency 13 100
+setConcurrency 13 50
 sleep 200
 # t=600
-setConcurrency 14 200
+setConcurrency 14 100
 sleep 200
 # t=800
-setConcurrency 11 100
+setConcurrency 11 10
 sleep 200
 
 # stop experiment
