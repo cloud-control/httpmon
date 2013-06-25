@@ -151,10 +151,10 @@ mergeIntoTimeSeries(timeseries, getLcTimeSeries(lc2LogLines), "vm2_")
 mergeIntoTimeSeries(timeseries, getLcTimeSeries(lc3LogLines), "vm3_")
 mergeIntoTimeSeries(timeseries, getLcTimeSeries(lc4LogLines), "vm4_")
 
-mergeIntoTimeSeries(timeseries, getClientTimeSeries(client1LogLines), "vm1_")
-mergeIntoTimeSeries(timeseries, getClientTimeSeries(client2LogLines), "vm2_")
-mergeIntoTimeSeries(timeseries, getClientTimeSeries(client3LogLines), "vm3_")
-mergeIntoTimeSeries(timeseries, getClientTimeSeries(client4LogLines), "vm4_")
+mergeIntoTimeSeries(timeseries, getClientTimeSeries(client1LogLines), "client1_")
+mergeIntoTimeSeries(timeseries, getClientTimeSeries(client2LogLines), "client2_")
+mergeIntoTimeSeries(timeseries, getClientTimeSeries(client3LogLines), "client3_")
+mergeIntoTimeSeries(timeseries, getClientTimeSeries(client4LogLines), "client4_")
 
 mergeIntoTimeSeries(timeseries, getRmTimeSeries(rmLogLines), "rm_")
 
@@ -179,7 +179,8 @@ else:
 	f = open(options.output, 'w')
 print("# Generated using: " + ' '.join(argv), file = f)
 
-print("time cap1 cap2 cap3 cap4 perf1 perf2 perf3 perf4")
+print("time cap1 cap2 cap3 cap4 perf1 perf2 perf3 perf4 sl1 sl2 sl3 sl4 latency1 latency2 latency3 latency4",
+	sep = ',', file = f)
 for t in range(tStart, tEnd, options.interval):
 	try:
 		print( \
@@ -192,6 +193,14 @@ for t in range(tStart, tEnd, options.interval):
 			saturate(getAggregateValue(timeseries, "vm2_perf", t, t+options.interval, min)),
 			saturate(getAggregateValue(timeseries, "vm3_perf", t, t+options.interval, min)),
 			saturate(getAggregateValue(timeseries, "vm4_perf", t, t+options.interval, min)),
+			getAggregateValue(timeseries, "vm1_serviceLevel", t, t+options.interval, avg),
+			getAggregateValue(timeseries, "vm2_serviceLevel", t, t+options.interval, avg),
+			getAggregateValue(timeseries, "vm3_serviceLevel", t, t+options.interval, avg),
+			getAggregateValue(timeseries, "vm4_serviceLevel", t, t+options.interval, avg),
+			getAggregateValue(timeseries, "client1_latency", t, t+options.interval, max),
+			getAggregateValue(timeseries, "client2_latency", t, t+options.interval, max),
+			getAggregateValue(timeseries, "client3_latency", t, t+options.interval, max),
+			getAggregateValue(timeseries, "client4_latency", t, t+options.interval, max),
 			sep = ',', file = f
 		)
 	except KeyError:
