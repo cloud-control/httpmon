@@ -92,7 +92,7 @@ if options.output is None:
 	f = stdout
 else:
 	f = open(options.output, 'w')
-print("# Generated using: " + ' '.join(argv), file = f)
+print("% Generated using: " + ' '.join(argv), file = f)
 
 aggregateInterval = options.interval
 for time in range(tStart, tEnd, aggregateInterval):
