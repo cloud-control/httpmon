@@ -4,11 +4,26 @@
 vm=rubis-hvm
 pole=$1
 serviceLevel=$2
-pattern=$3
+patternId=$3
 httpmon=./httpmon
 actuator=./actuator
 lc=./rubis/PHP/localController.py
 url="http://rubis-hvm/PHP/RandomItem.php"
+
+case $patternId in
+	1) pattern="100 150 150 100 150 100 050 050 150 100" ;;
+	2) pattern="200 250 250 200 250 200 150 150 250 200" ;;
+	3) pattern="400 450 450 400 450 400 350 350 450 400" ;;
+	4) pattern="600 650 650 600 650 600 550 550 650 600" ;;
+	5) pattern="800 50 800 50 800 50 800 50 800 50" ;;
+	6) pattern="50 800 50 800 50 800 50 800 50 800" ;;
+	7) pattern="400 800 50 400 200 600 200 400 800 400" ;;
+	8) pattern="250 75 125 85 650 575 275 750 75 375" ;;
+	9) pattern="325 625 650 200 425 385 525 575 600 250" ;;
+	0) pattern="675 475 450 775 750 600 500 325 475 100" ;;
+	C) pattern="400" ;;
+	*) echo "Unknown pattern Id $patternId" >&2; exit 1;;
+esac
 
 # Helper functions
 function setCap {
@@ -93,3 +108,8 @@ kill $lcPid
 wait $lcPid || true
 
 # done
+cd ..
+poleId=`echo $pole | tr -d .`
+serviceLevelId=`echo $serviceLevel | tr -d .`
+./prepareCsv.py -d $resultsdir -o exp_${patternId}_${poleId}_${serviceLevelId}.csv
+
