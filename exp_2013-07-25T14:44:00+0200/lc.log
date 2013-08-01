@@ -1,0 +1,111 @@
+1374756243.336052 INFO  [root] No traffic since last control interval.
+1374756244.337510 INFO  [root] No traffic since last control interval.
+1374756245.338831 INFO  [root] No traffic since last control interval.
+1374756246.340166 INFO  [root] No traffic since last control interval.
+1374756247.341534 INFO  [root] No traffic since last control interval.
+1374756248.342879 INFO  [root] No traffic since last control interval.
+1374756249.344255 INFO  [root] No traffic since last control interval.
+1374756250.345630 INFO  [root] No traffic since last control interval.
+1374756251.346935 INFO  [root] No traffic since last control interval.
+1374756252.348257 INFO  [root] No traffic since last control interval.
+1374756253.349354 INFO  [root] latency=2:52:181:202:282:(139)ms throughput=27rps rr=56.38% total=27 perf=0.718
+1374756254.350083 INFO  [root] latency=1:23:88:193:282:(109)ms throughput=35rps rr=63.57% total=62 perf=0.718
+1374756255.351182 INFO  [root] latency=1:21:103:215:407:(129)ms throughput=37rps rr=68.20% total=99 perf=0.593
+1374756256.351738 INFO  [root] latency=1:22:103:213:407:(128)ms throughput=34rps rr=73.18% total=133 perf=0.593
+1374756257.352658 INFO  [root] latency=1:23:111:219:426:(134)ms throughput=31rps rr=78.10% total=164 perf=0.574
+1374756258.353518 INFO  [root] latency=1:9:104:231:526:(134)ms throughput=38rps rr=81.62% total=202 perf=0.474
+1374756259.353849 INFO  [root] latency=2:15:126:244:526:(146)ms throughput=32rps rr=85.29% total=234 perf=0.474
+1374756260.354712 INFO  [root] latency=2:26:127:281:887:(177)ms throughput=26rps rr=85.83% total=260 perf=0.113
+1374756261.356242 INFO  [root] latency=2:34:172:326:999:(248)ms throughput=21rps rr=85.84% total=281 perf=0.001
+1374756262.357326 INFO  [root] latency=2:36:224:474:999:(292)ms throughput=30rps rr=85.85% total=311 perf=0.001
+1374756263.358390 INFO  [root] latency=1:92:296:607:1123:(372)ms throughput=36rps rr=81.15% total=347 perf=-0.123
+1374756264.358624 INFO  [root] latency=1:120:335:635:1123:(391)ms throughput=20rps rr=76.71% total=367 perf=-0.123
+1374756265.359234 INFO  [root] latency=1:78:253:512:1123:(337)ms throughput=33rps rr=72.51% total=400 perf=-0.123
+1374756266.360202 INFO  [root] latency=1:40:209:396:1123:(273)ms throughput=35rps rr=68.54% total=435 perf=-0.123
+1374756267.360561 INFO  [root] latency=1:28:169:351:1123:(233)ms throughput=36rps rr=64.79% total=471 perf=-0.123
+1374756268.361441 INFO  [root] latency=1:19:126:304:618:(167)ms throughput=38rps rr=66.80% total=509 perf=0.382
+1374756269.362673 INFO  [root] latency=1:7:108:281:618:(157)ms throughput=25rps rr=68.87% total=534 perf=0.382
+1374756270.363309 INFO  [root] latency=1:6:98:234:618:(149)ms throughput=26rps rr=71.00% total=560 perf=0.382
+1374756271.363946 INFO  [root] latency=1:13:116:304:758:(180)ms throughput=36rps rr=72.13% total=596 perf=0.242
+1374756272.364451 INFO  [root] latency=1:13:127:314:758:(189)ms throughput=30rps rr=73.29% total=626 perf=0.242
+1374756273.365677 INFO  [root] latency=1:21:149:280:758:(188)ms throughput=27rps rr=74.46% total=653 perf=0.242
+1374756274.365903 INFO  [root] latency=1:18:144:288:758:(188)ms throughput=23rps rr=75.65% total=676 perf=0.242
+1374756275.366874 INFO  [root] latency=1:18:177:373:807:(237)ms throughput=37rps rr=76.55% total=713 perf=0.193
+1374756276.367706 INFO  [root] latency=2:16:154:290:807:(200)ms throughput=30rps rr=77.47% total=743 perf=0.193
+1374756277.368022 INFO  [root] latency=2:23:155:309:855:(214)ms throughput=35rps rr=78.13% total=778 perf=0.145
+1374756278.368901 INFO  [root] latency=1:21:163:350:855:(222)ms throughput=21rps rr=78.79% total=799 perf=0.145
+1374756279.370034 INFO  [root] latency=1:38:189:345:855:(230)ms throughput=34rps rr=79.45% total=833 perf=0.145
+1374756280.370971 INFO  [root] latency=1:39:159:295:855:(191)ms throughput=22rps rr=80.13% total=855 perf=0.145
+1374756281.372198 INFO  [root] latency=1:52:173:349:882:(233)ms throughput=23rps rr=80.66% total=878 perf=0.118
+1374756282.372831 INFO  [root] latency=1:47:184:370:1150:(262)ms throughput=33rps rr=75.39% total=911 perf=-0.150
+1374756283.373109 INFO  [root] latency=2:34:191:463:1150:(280)ms throughput=39rps rr=70.46% total=950 perf=-0.150
+1374756284.374128 INFO  [root] latency=2:22:150:455:1150:(261)ms throughput=34rps rr=65.85% total=984 perf=-0.150
+1374756285.374606 INFO  [root] latency=2:21:154:464:1150:(261)ms throughput=19rps rr=61.54% total=1003 perf=-0.150
+1374756286.375145 INFO  [root] latency=2:11:118:232:1150:(202)ms throughput=38rps rr=57.52% total=1041 perf=-0.150
+1374756287.376290 INFO  [root] latency=2:3:65:203:961:(137)ms throughput=30rps rr=57.64% total=1071 perf=0.039
+1374756288.376991 INFO  [root] latency=2:3:26:173:378:(86)ms throughput=27rps rr=62.38% total=1098 perf=0.622
+1374756289.377847 INFO  [root] latency=2:3:29:176:378:(87)ms throughput=26rps rr=67.51% total=1124 perf=0.622
+1374756290.378210 INFO  [root] latency=2:3:31:178:415:(91)ms throughput=30rps rr=72.27% total=1154 perf=0.585
+1374756291.379308 INFO  [root] latency=2:3:38:219:894:(141)ms throughput=37rps rr=72.70% total=1191 perf=0.106
+1374756292.380386 INFO  [root] latency=1:5:101:233:894:(158)ms throughput=27rps rr=73.13% total=1218 perf=0.106
+1374756293.380734 INFO  [root] latency=1:17:108:237:894:(161)ms throughput=34rps rr=73.56% total=1252 perf=0.106
+1374756294.381645 INFO  [root] latency=1:17:118:242:894:(164)ms throughput=31rps rr=73.99% total=1283 perf=0.106
+1374756295.382319 INFO  [root] latency=1:16:118:244:894:(161)ms throughput=29rps rr=74.43% total=1312 perf=0.106
+1374756296.382713 INFO  [root] latency=1:5:86:190:353:(108)ms throughput=26rps rr=81.24% total=1338 perf=0.647
+1374756297.383121 INFO  [root] latency=1:5:75:185:417:(102)ms throughput=25rps rr=86.92% total=1363 perf=0.583
+1374756298.384033 INFO  [root] latency=2:7:91:205:736:(143)ms throughput=25rps rr=88.48% total=1388 perf=0.264
+1374756299.384617 INFO  [root] latency=2:16:136:255:736:(172)ms throughput=25rps rr=90.07% total=1413 perf=0.264
+1374756300.385541 INFO  [root] latency=2:43:197:383:1186:(260)ms throughput=34rps rr=83.01% total=1447 perf=-0.186
+1374756301.386741 INFO  [root] latency=2:107:255:526:1186:(320)ms throughput=38rps rr=76.49% total=1485 perf=-0.186
+1374756302.387074 INFO  [root] latency=2:125:332:587:1186:(381)ms throughput=27rps rr=70.49% total=1512 perf=-0.186
+1374756303.387783 INFO  [root] latency=2:108:330:625:1186:(387)ms throughput=40rps rr=64.96% total=1552 perf=-0.186
+1374756304.388720 INFO  [root] latency=2:43:266:572:1186:(353)ms throughput=36rps rr=59.87% total=1588 perf=-0.186
+1374756305.389703 INFO  [root] latency=2:28:215:471:1126:(294)ms throughput=32rps rr=56.53% total=1620 perf=-0.126
+1374756306.390467 INFO  [root] latency=1:12:167:345:1126:(237)ms throughput=38rps rr=53.37% total=1658 perf=-0.126
+1374756307.391243 INFO  [root] latency=1:6:119:252:1126:(178)ms throughput=28rps rr=50.39% total=1686 perf=-0.126
+1374756308.391741 INFO  [root] latency=1:5:70:203:398:(116)ms throughput=36rps rr=54.20% total=1722 perf=0.602
+1374756309.392227 INFO  [root] latency=1:3:65:189:398:(104)ms throughput=24rps rr=58.29% total=1746 perf=0.602
+1374756310.392974 INFO  [root] latency=1:3:32:162:398:(85)ms throughput=29rps rr=62.69% total=1775 perf=0.602
+1374756311.393275 INFO  [root] latency=2:3:32:150:305:(76)ms throughput=21rps rr=69.84% total=1796 perf=0.695
+1374756312.393893 INFO  [root] latency=1:3:36:170:464:(92)ms throughput=27rps rr=73.88% total=1823 perf=0.536
+1374756313.395060 INFO  [root] latency=1:3:97:215:1042:(175)ms throughput=33rps rr=72.39% total=1856 perf=-0.042
+1374756314.396202 INFO  [root] latency=1:6:135:297:1042:(208)ms throughput=37rps rr=70.94% total=1893 perf=-0.042
+1374756315.396476 INFO  [root] latency=1:10:142:297:1042:(214)ms throughput=30rps rr=69.51% total=1923 perf=-0.042
+1374756316.396666 INFO  [root] latency=1:20:147:296:1042:(218)ms throughput=23rps rr=68.11% total=1946 perf=-0.042
+1374756317.397360 INFO  [root] latency=1:13:142:286:1042:(210)ms throughput=29rps rr=66.74% total=1975 perf=-0.042
+1374756318.397826 INFO  [root] latency=1:11:111:231:659:(152)ms throughput=32rps rr=68.46% total=2007 perf=0.341
+1374756319.398489 INFO  [root] latency=1:6:100:190:459:(119)ms throughput=30rps rr=72.49% total=2037 perf=0.541
+1374756320.399587 INFO  [root] latency=1:6:109:244:540:(140)ms throughput=34rps rr=75.58% total=2071 perf=0.460
+1374756321.400333 INFO  [root] latency=1:6:115:281:835:(175)ms throughput=37rps rr=76.32% total=2108 perf=0.165
+1374756322.400738 INFO  [root] latency=1:6:123:373:1152:(216)ms throughput=24rps rr=71.27% total=2132 perf=-0.152
+1374756323.401743 INFO  [root] latency=1:8:180:452:1202:(292)ms throughput=38rps rr=65.29% total=2170 perf=-0.202
+1374756324.402911 INFO  [root] latency=1:27:231:470:1202:(315)ms throughput=33rps rr=59.80% total=2203 perf=-0.202
+1374756325.403608 INFO  [root] latency=1:14:160:453:1202:(290)ms throughput=35rps rr=54.78% total=2238 perf=-0.202
+1374756326.404453 INFO  [root] latency=2:10:158:400:1202:(269)ms throughput=35rps rr=50.18% total=2273 perf=-0.202
+1374756327.405594 INFO  [root] latency=2:5:125:353:1202:(227)ms throughput=27rps rr=45.96% total=2300 perf=-0.202
+1374756328.406751 INFO  [root] latency=2:3:77:202:668:(133)ms throughput=27rps rr=47.10% total=2327 perf=0.332
+1374756329.407298 INFO  [root] latency=2:3:32:188:623:(102)ms throughput=44rps rr=48.53% total=2371 perf=0.377
+1374756330.407752 INFO  [root] latency=2:3:21:178:623:(93)ms throughput=43rps rr=50.00% total=2414 perf=0.377
+1374756331.408243 INFO  [root] latency=2:3:11:133:378:(68)ms throughput=35rps rr=54.11% total=2449 perf=0.622
+1374756332.408321 INFO  [root] latency=2:3:21:113:494:(68)ms throughput=29rps rr=56.88% total=2478 perf=0.506
+1374756333.409431 INFO  [root] latency=2:3:28:170:951:(121)ms throughput=35rps rr=57.03% total=2513 perf=0.049
+1374756334.410163 INFO  [root] latency=2:3:27:158:951:(118)ms throughput=36rps rr=57.18% total=2549 perf=0.049
+1374756335.410398 INFO  [root] latency=2:3:41:170:951:(128)ms throughput=35rps rr=57.32% total=2584 perf=0.049
+1374756336.411081 INFO  [root] latency=2:3:38:165:951:(128)ms throughput=32rps rr=57.47% total=2616 perf=0.049
+1374756337.411837 INFO  [root] latency=2:3:36:169:951:(123)ms throughput=32rps rr=57.62% total=2648 perf=0.049
+1374756338.412269 INFO  [root] latency=2:3:32:134:304:(70)ms throughput=28rps rr=64.21% total=2676 perf=0.696
+1374756339.413278 INFO  [root] latency=2:3:42:153:406:(81)ms throughput=28rps rr=68.92% total=2704 perf=0.594
+1374756340.414506 INFO  [root] latency=2:3:45:167:406:(90)ms throughput=26rps rr=73.97% total=2730 perf=0.594
+1374756341.415277 INFO  [root] latency=2:6:86:227:1343:(182)ms throughput=27rps rr=64.53% total=2757 perf=-0.343
+1374756342.415729 INFO  [root] latency=2:8:150:305:1427:(253)ms throughput=39rps rr=54.88% total=2796 perf=-0.427
+1374756343.416446 INFO  [root] latency=2:8:144:313:1427:(249)ms throughput=34rps rr=46.67% total=2830 perf=-0.427
+1374756344.417397 INFO  [root] latency=1:8:119:310:1427:(240)ms throughput=38rps rr=39.69% total=2868 perf=-0.427
+1374756345.417726 INFO  [root] latency=1:3:102:261:1427:(226)ms throughput=28rps rr=33.75% total=2896 perf=-0.427
+1374756346.418020 INFO  [root] latency=1:3:33:192:1427:(146)ms throughput=31rps rr=28.70% total=2927 perf=-0.427
+1374756347.418551 INFO  [root] latency=1:3:9:132:516:(77)ms throughput=31rps rr=30.05% total=2958 perf=0.484
+1374756348.419136 INFO  [root] latency=1:3:3:104:516:(61)ms throughput=33rps rr=31.46% total=2991 perf=0.484
+1374756349.420306 INFO  [root] latency=2:2:3:65:233:(43)ms throughput=41rps rr=36.64% total=3032 perf=0.767
+1374756350.420607 INFO  [root] latency=2:2:3:58:257:(41)ms throughput=46rps rr=41.93% total=3078 perf=0.743
+1374756351.421438 INFO  [root] latency=1:2:3:53:311:(44)ms throughput=36rps rr=46.58% total=3114 perf=0.689
+1374756352.422467 INFO  [root] latency=1:2:3:76:311:(47)ms throughput=29rps rr=51.75% total=3143 perf=0.689
+1374756353.422686 INFO  [root] latency=1:2:3:118:311:(55)ms throughput=27rps rr=57.48% total=3170 perf=0.689

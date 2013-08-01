@@ -26,9 +26,8 @@ def stats(a):
 parser = OptionParser()
 (options, args) = parser.parse_args()
 
-totalRecommendationsForPole = defaultdict(lambda: [])
-totalNonRecommendationsForPole = defaultdict(lambda: [])
-totalErrorsForPole = defaultdict(lambda: [])
+totalRecommendationsForController = defaultdict(lambda: [])
+totalNonRecommendationsForController = defaultdict(lambda: [])
 
 for directory in args:
 	#
@@ -67,12 +66,13 @@ for directory in args:
 	for line in clientLogLines:
 		try:
 			rr = float(re.search("rr=([0-9.]+)", line).group(1))
-			errors = float(re.search("errors=([0-9.]+)", line).group(1))
+			errors = int(re.search("errors=([0-9.]+)", line).group(1))
 			total = int(re.search("total=([0-9.]+)", line).group(1))
 
 			numRequests = total - lastTotal
+			lastTotal = total
 			numRecommendations = int(round(numRequests * rr / 100))
-			numErrors = int(round(numRequests * errors / 100))
+			numErrors = errors
 
 			totalRequests += numRequests
 			totalRecommendations += numRecommendations
@@ -80,12 +80,12 @@ for directory in args:
 		except AttributeError:
 			print("Ignoring line {0}".format(line.strip()), file = stderr)
 	
-	totalRecommendationsForPole[pole].append(float(totalRecommendations) / totalRequests)
-	#totalNonRecommendationsForPole[pole].append(totalRequests - totalRecommendations)
-	totalErrorsForPole[pole].append(float(totalErrors) / totalRequests)
+	totalRecommendationsForController[(pole, serviceLevel)].append(totalRecommendations)
+	totalNonRecommendationsForController[(pole, serviceLevel)].append(totalRequests - totalErrors - totalRecommendations)
 
 #
 # Output results
 #
-for pole in sorted(totalRecommendationsForPole):
-	print(pole, *stats(totalRecommendationsForPole[pole]) +stats(totalErrorsForPole[pole]), sep = ',')
+print("% Generated using: " + ' '.join(argv))
+for pole, serviceLevel in sorted(totalRecommendationsForController):
+	print(pole, serviceLevel, *stats(totalRecommendationsForController[(pole, serviceLevel)]) +stats(totalNonRecommendationsForController[(pole, serviceLevel)]), sep = ',')
