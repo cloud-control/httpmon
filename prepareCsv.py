@@ -13,7 +13,11 @@ from sys import argv, stdin, stdout, stderr
 #
 # Helper functions
 #
-def avg(a):
+def _max(a):
+	if len(a) == 0: return float('nan')
+	return max(a)
+def _avg(a):
+	if len(a) == 0: return float('nan')
 	return sum(a) / len(a)
 def inExpDir(f):
 	global options
@@ -83,7 +87,7 @@ for line in expLogLines:
 		pass
 
 # Get experiment end
-tEnd = min(max(tRubis), max(sRubis))
+tEnd = max(tRubis)
 
 #
 # Output results
@@ -102,11 +106,20 @@ for time in range(tStart, tEnd, aggregateInterval):
 	for t in range(time, time + aggregateInterval):
 		try:
 			latencies.append(tRubis[t])
+		except KeyError:
+			pass
+			#print("Missing latency data for absolute time {0}, relative time {1}".format(t, t-tStart), file = stderr)
+
+		try:
 			recommandationRates.append(rRubis[t])
+		except KeyError:
+			pass
+			#print("Missing recommandation rate data for absolute time {0}, relative time {1}".format(t, t-tStart), file = stderr)
+
+		try:
 			serviceLevels.append(sRubis[t])
 		except KeyError:
-			print("Missing data for absolute time {0}, relative time {1}".format(t, t-tStart), file = stderr)
-			continue
-	if len(latencies) == 0: continue
-	if len(serviceLevels) == 0: continue
-	print(time-tStart, max(latencies) / 1000, avg(recommandationRates) / 100, avg(serviceLevels) / 100, sep = ',', file = f)
+			pass
+			#print("Missing service level for absolute time {0}, relative time {1}".format(t, t-tStart), file = stderr)
+
+	print(time-tStart, _max(latencies) / 1000, _avg(recommandationRates) / 100, _avg(serviceLevels) / 100, sep = ',', file = f)
