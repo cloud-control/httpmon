@@ -1,0 +1,84 @@
+Currently running VMs
+2013-07-24 10:27:07.411+0000: 8477: info : libvirt version: 0.9.8
+2013-07-24 10:27:07.411+0000: 8477: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=287 vcpus=3 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=800 vcpus=8 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=800 vcpus=8
+Currently running VMs
+2013-07-24 10:27:18.371+0000: 8533: info : libvirt version: 0.9.8
+2013-07-24 10:27:18.371+0000: 8533: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=287 vcpus=3 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=800 vcpus=8 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=250 vcpus=3
+Currently running VMs
+2013-07-24 10:27:29.336+0000: 8681: info : libvirt version: 0.9.8
+2013-07-24 10:27:29.336+0000: 8681: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=287 vcpus=3 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=250 vcpus=3 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=75 vcpus=1
+Currently running VMs
+2013-07-24 10:27:40.270+0000: 8729: info : libvirt version: 0.9.8
+2013-07-24 10:27:40.270+0000: 8729: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=287 vcpus=3 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=75 vcpus=1 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=125 vcpus=2
+Currently running VMs
+2013-07-24 10:27:51.229+0000: 8778: info : libvirt version: 0.9.8
+2013-07-24 10:27:51.229+0000: 8778: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=287 vcpus=3 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=125 vcpus=2 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=85 vcpus=1
+Currently running VMs
+2013-07-24 10:28:02.151+0000: 8826: info : libvirt version: 0.9.8
+2013-07-24 10:28:02.151+0000: 8826: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=287 vcpus=3 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=85 vcpus=1 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=650 vcpus=7
+Currently running VMs
+2013-07-24 10:28:13.069+0000: 8874: info : libvirt version: 0.9.8
+2013-07-24 10:28:13.069+0000: 8874: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=287 vcpus=3 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=650 vcpus=7 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=575 vcpus=6
+Currently running VMs
+2013-07-24 10:28:23.985+0000: 8922: info : libvirt version: 0.9.8
+2013-07-24 10:28:23.985+0000: 8922: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=287 vcpus=3 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=575 vcpus=6 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=275 vcpus=3
+Currently running VMs
+2013-07-24 10:28:34.890+0000: 8970: info : libvirt version: 0.9.8
+2013-07-24 10:28:34.890+0000: 8970: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=287 vcpus=3 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=275 vcpus=3 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=750 vcpus=8
+Currently running VMs
+2013-07-24 10:28:45.833+0000: 9018: info : libvirt version: 0.9.8
+2013-07-24 10:28:45.833+0000: 9018: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=287 vcpus=3 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=750 vcpus=8 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=75 vcpus=1
+Currently running VMs
+2013-07-24 10:28:56.822+0000: 9066: info : libvirt version: 0.9.8
+2013-07-24 10:28:56.822+0000: 9066: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=287 vcpus=3 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=75 vcpus=1 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=375 vcpus=4
+Currently running VMs
+2013-07-24 10:29:07.778+0000: 9114: info : libvirt version: 0.9.8
+2013-07-24 10:29:07.778+0000: 9114: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
+- Domain-0 weight=256 cap=0 vcpus=32
+- rubbos-hvm weight=256 cap=287 vcpus=3 mac=aa:00:00:00:00:11
+- rubis-hvm weight=256 cap=375 vcpus=4 mac=aa:00:00:00:00:10
+New scheduling parameters:  weight=256 cap=800 vcpus=8

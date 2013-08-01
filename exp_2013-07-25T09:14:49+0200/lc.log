@@ -1,0 +1,141 @@
+1374736494.614433 INFO  [root] No traffic since last control interval.
+1374736495.615864 INFO  [root] No traffic since last control interval.
+1374736496.617185 INFO  [root] No traffic since last control interval.
+1374736497.618482 INFO  [root] No traffic since last control interval.
+1374736498.619826 INFO  [root] No traffic since last control interval.
+1374736499.621116 INFO  [root] No traffic since last control interval.
+1374736500.622432 INFO  [root] No traffic since last control interval.
+1374736501.623774 INFO  [root] No traffic since last control interval.
+1374736502.625130 INFO  [root] No traffic since last control interval.
+1374736503.625841 INFO  [root] latency=2:2:3:3:109:(7)ms throughput=27rps rr=86.60% total=27 perf=0.891
+1374736504.626364 INFO  [root] latency=2:3:3:217:721:(130)ms throughput=11rps rr=89.62% total=38 perf=0.279
+1374736505.627433 INFO  [root] latency=1:3:4:398:1183:(204)ms throughput=16rps rr=77.15% total=54 perf=-0.183
+1374736506.628117 INFO  [root] latency=1:3:9:419:1677:(240)ms throughput=9rps rr=49.12% total=63 perf=-0.677
+1374736507.628908 INFO  [root] latency=1:3:78:648:3250:(492)ms throughput=21rps rr=18.52% total=84 perf=-2.250
+1374736508.629394 INFO  [root] latency=1:65:363:1157:4138:(795)ms throughput=29rps rr=5.88% total=113 perf=-3.138
+1374736509.630243 INFO  [root] latency=1:18:229:1870:4784:(1103)ms throughput=38rps rr=1.69% total=151 perf=-3.784
+1374736510.630879 INFO  [root] latency=1:4:91:2618:4784:(1170)ms throughput=59rps rr=0.49% total=210 perf=-3.784
+1374736511.631634 INFO  [root] latency=1:3:35:2165:4784:(1043)ms throughput=24rps rr=0.14% total=234 perf=-3.784
+1374736512.632177 INFO  [root] latency=1:3:6:1108:4784:(875)ms throughput=24rps rr=0.04% total=258 perf=-3.784
+1374736513.633098 INFO  [root] latency=1:2:3:38:4784:(688)ms throughput=37rps rr=0.01% total=295 perf=-3.784
+1374736514.633832 INFO  [root] latency=1:2:3:4:4578:(376)ms throughput=27rps rr=0.00% total=322 perf=-3.578
+1374736515.634598 INFO  [root] latency=2:2:3:3:38:(3)ms throughput=34rps rr=0.01% total=356 perf=0.962
+1374736516.634872 INFO  [root] latency=2:2:3:3:38:(4)ms throughput=42rps rr=0.04% total=398 perf=0.962
+1374736517.635606 INFO  [root] latency=2:2:3:3:38:(4)ms throughput=30rps rr=0.12% total=428 perf=0.962
+1374736518.635921 INFO  [root] latency=2:2:3:3:30:(3)ms throughput=27rps rr=0.48% total=455 perf=0.970
+1374736519.636230 INFO  [root] latency=2:2:3:3:30:(3)ms throughput=31rps rr=1.88% total=486 perf=0.970
+1374736520.636502 INFO  [root] latency=2:2:3:3:151:(4)ms throughput=33rps rr=2.84% total=519 perf=0.849
+1374736521.637152 INFO  [root] latency=2:2:3:3:151:(5)ms throughput=22rps rr=4.28% total=541 perf=0.849
+1374736522.637642 INFO  [root] latency=2:2:3:3:180:(6)ms throughput=35rps rr=6.04% total=576 perf=0.820
+1374736523.638657 INFO  [root] latency=2:2:3:3:180:(6)ms throughput=36rps rr=8.51% total=612 perf=0.820
+1374736524.639661 INFO  [root] latency=2:2:3:3:180:(9)ms throughput=31rps rr=11.99% total=643 perf=0.820
+1374736525.640391 INFO  [root] latency=2:2:3:3:180:(9)ms throughput=20rps rr=16.90% total=663 perf=0.820
+1374736526.641284 INFO  [root] latency=2:2:3:3:180:(9)ms throughput=27rps rr=23.82% total=690 perf=0.820
+1374736527.641693 INFO  [root] latency=2:2:3:3:154:(10)ms throughput=43rps rr=35.61% total=733 perf=0.846
+1374736528.692537 INFO  [root] latency=2:2:3:6:509:(30)ms throughput=28rps rr=38.70% total=762 perf=0.491
+1374736529.694516 INFO  [root] latency=1:2:3:43:709:(75)ms throughput=47rps rr=40.12% total=809 perf=0.291
+1374736530.695548 INFO  [root] latency=1:2:5:141:709:(96)ms throughput=35rps rr=41.60% total=844 perf=0.291
+1374736531.696109 INFO  [root] latency=1:3:7:173:709:(106)ms throughput=30rps rr=43.14% total=874 perf=0.291
+1374736532.697009 INFO  [root] latency=1:3:13:235:711:(141)ms throughput=29rps rr=44.71% total=903 perf=0.289
+1374736533.697426 INFO  [root] latency=1:3:34:239:714:(143)ms throughput=34rps rr=46.32% total=937 perf=0.286
+1374736534.698310 INFO  [root] latency=1:3:31:235:847:(144)ms throughput=35rps rr=47.07% total=972 perf=0.153
+1374736535.699222 INFO  [root] latency=1:3:10:182:847:(131)ms throughput=27rps rr=47.84% total=999 perf=0.153
+1374736536.699948 INFO  [root] latency=1:3:11:203:847:(135)ms throughput=22rps rr=48.61% total=1021 perf=0.153
+1374736537.700115 INFO  [root] latency=1:3:9:136:847:(106)ms throughput=28rps rr=49.40% total=1049 perf=0.153
+1374736538.701186 INFO  [root] latency=1:2:8:121:1208:(113)ms throughput=31rps rr=41.74% total=1080 perf=-0.208
+1374736539.702089 INFO  [root] latency=1:2:9:118:1534:(128)ms throughput=27rps rr=28.66% total=1107 perf=-0.534
+1374736540.703544 INFO  [root] latency=1:3:23:322:2219:(299)ms throughput=51rps rr=14.49% total=1158 perf=-1.219
+1374736541.704651 INFO  [root] latency=1:2:5:199:2219:(265)ms throughput=37rps rr=7.32% total=1195 perf=-1.219
+1374736542.704843 INFO  [root] latency=1:2:5:200:2219:(266)ms throughput=27rps rr=3.70% total=1222 perf=-1.219
+1374736543.705782 INFO  [root] latency=1:2:3:150:2219:(267)ms throughput=11rps rr=1.87% total=1233 perf=-1.219
+1374736544.707086 INFO  [root] latency=1:2:3:68:2219:(261)ms throughput=0rps rr=0.95% total=1233 perf=-1.219
+1374736545.708219 INFO  [root] latency=2:2:3:3:203:(11)ms throughput=0rps rr=1.28% total=1233 perf=0.797
+1374736546.709279 INFO  [root] latency=2:2:3:5:203:(17)ms throughput=0rps rr=1.73% total=1233 perf=0.797
+1374736547.711177 INFO  [root] latency=2:2:2:3:35:(9)ms throughput=0rps rr=6.06% total=1233 perf=0.965
+1374736548.712874 INFO  [root] No traffic since last control interval.
+1374736549.714216 INFO  [root] No traffic since last control interval.
+1374736550.715537 INFO  [root] No traffic since last control interval.
+1374736551.716883 INFO  [root] No traffic since last control interval.
+1374736552.718232 INFO  [root] No traffic since last control interval.
+1374736553.719566 INFO  [root] No traffic since last control interval.
+1374736554.720878 INFO  [root] No traffic since last control interval.
+1374736555.722214 INFO  [root] No traffic since last control interval.
+1374736556.723546 INFO  [root] No traffic since last control interval.
+1374736557.724876 INFO  [root] No traffic since last control interval.
+1374736558.726157 INFO  [root] No traffic since last control interval.
+1374736559.727465 INFO  [root] No traffic since last control interval.
+1374736560.728802 INFO  [root] No traffic since last control interval.
+1374736561.730143 INFO  [root] No traffic since last control interval.
+1374736562.731422 INFO  [root] No traffic since last control interval.
+1374736563.732785 INFO  [root] No traffic since last control interval.
+1374736564.734111 INFO  [root] No traffic since last control interval.
+1374736565.735441 INFO  [root] No traffic since last control interval.
+1374736566.736769 INFO  [root] No traffic since last control interval.
+1374736567.738100 INFO  [root] No traffic since last control interval.
+1374736568.739407 INFO  [root] No traffic since last control interval.
+1374736569.740724 INFO  [root] No traffic since last control interval.
+1374736570.742083 INFO  [root] No traffic since last control interval.
+1374736571.743417 INFO  [root] No traffic since last control interval.
+1374736572.744724 INFO  [root] No traffic since last control interval.
+1374736573.746049 INFO  [root] No traffic since last control interval.
+1374736574.747378 INFO  [root] No traffic since last control interval.
+1374736575.748711 INFO  [root] No traffic since last control interval.
+1374736576.750046 INFO  [root] No traffic since last control interval.
+1374736577.751370 INFO  [root] No traffic since last control interval.
+1374736578.752650 INFO  [root] No traffic since last control interval.
+1374736579.753978 INFO  [root] No traffic since last control interval.
+1374736580.755302 INFO  [root] No traffic since last control interval.
+1374736581.756645 INFO  [root] No traffic since last control interval.
+1374736582.758003 INFO  [root] No traffic since last control interval.
+1374736583.759281 INFO  [root] No traffic since last control interval.
+1374736584.760607 INFO  [root] No traffic since last control interval.
+1374736585.761995 INFO  [root] No traffic since last control interval.
+1374736586.763336 INFO  [root] No traffic since last control interval.
+1374736587.764658 INFO  [root] No traffic since last control interval.
+1374736588.765952 INFO  [root] No traffic since last control interval.
+1374736589.767280 INFO  [root] No traffic since last control interval.
+1374736590.768592 INFO  [root] No traffic since last control interval.
+1374736591.769922 INFO  [root] No traffic since last control interval.
+1374736592.771252 INFO  [root] No traffic since last control interval.
+1374736593.772560 INFO  [root] No traffic since last control interval.
+1374736594.773921 INFO  [root] No traffic since last control interval.
+1374736595.775246 INFO  [root] No traffic since last control interval.
+1374736596.776573 INFO  [root] No traffic since last control interval.
+1374736597.777898 INFO  [root] No traffic since last control interval.
+1374736598.779232 INFO  [root] No traffic since last control interval.
+1374736599.780554 INFO  [root] No traffic since last control interval.
+1374736600.781887 INFO  [root] No traffic since last control interval.
+1374736601.783219 INFO  [root] No traffic since last control interval.
+1374736602.784570 INFO  [root] No traffic since last control interval.
+1374736603.785865 INFO  [root] No traffic since last control interval.
+1374736604.787194 INFO  [root] No traffic since last control interval.
+1374736605.788494 INFO  [root] No traffic since last control interval.
+1374736606.789821 INFO  [root] No traffic since last control interval.
+1374736607.791142 INFO  [root] No traffic since last control interval.
+1374736608.792465 INFO  [root] No traffic since last control interval.
+1374736609.793792 INFO  [root] No traffic since last control interval.
+1374736610.795091 INFO  [root] No traffic since last control interval.
+1374736611.796374 INFO  [root] No traffic since last control interval.
+1374736612.797702 INFO  [root] No traffic since last control interval.
+1374736613.798983 INFO  [root] No traffic since last control interval.
+1374736614.800321 INFO  [root] No traffic since last control interval.
+1374736615.801639 INFO  [root] No traffic since last control interval.
+1374736616.802961 INFO  [root] No traffic since last control interval.
+1374736617.804292 INFO  [root] No traffic since last control interval.
+1374736618.805588 INFO  [root] No traffic since last control interval.
+1374736619.806922 INFO  [root] No traffic since last control interval.
+1374736620.808225 INFO  [root] No traffic since last control interval.
+1374736621.809569 INFO  [root] No traffic since last control interval.
+1374736622.810952 INFO  [root] No traffic since last control interval.
+1374736623.812298 INFO  [root] No traffic since last control interval.
+1374736624.813608 INFO  [root] No traffic since last control interval.
+1374736625.814937 INFO  [root] No traffic since last control interval.
+1374736626.816266 INFO  [root] No traffic since last control interval.
+1374736627.817594 INFO  [root] No traffic since last control interval.
+1374736628.818604 INFO  [root] No traffic since last control interval.
+1374736629.819955 INFO  [root] No traffic since last control interval.
+1374736630.821294 INFO  [root] No traffic since last control interval.
+1374736631.822629 INFO  [root] No traffic since last control interval.
+1374736632.824029 INFO  [root] No traffic since last control interval.
+1374736633.825739 INFO  [root] No traffic since last control interval.
+1374736634.827050 INFO  [root] No traffic since last control interval.
