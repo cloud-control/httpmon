@@ -1,0 +1,358 @@
+[1375712573.496695] latency=nan:nan:nan:nan:nan:(-nan)ms throughput=0rps rr=-nan% cr=-nan% errors=0 total=0
+[1375712574.500640] latency=nan:nan:nan:nan:nan:(-nan)ms throughput=0rps rr=-nan% cr=-nan% errors=0 total=0
+[1375712575.504647] latency=nan:nan:nan:nan:nan:(-nan)ms throughput=0rps rr=-nan% cr=-nan% errors=0 total=0
+[1375712576.508673] latency=nan:nan:nan:nan:nan:(-nan)ms throughput=0rps rr=-nan% cr=-nan% errors=0 total=0
+[1375712577.512665] latency=nan:nan:nan:nan:nan:(-nan)ms throughput=0rps rr=-nan% cr=-nan% errors=0 total=0
+[1375712578.516663] latency=nan:nan:nan:nan:nan:(-nan)ms throughput=0rps rr=-nan% cr=-nan% errors=0 total=0
+[1375712579.520688] latency=nan:nan:nan:nan:nan:(-nan)ms throughput=0rps rr=-nan% cr=-nan% errors=0 total=0
+[1375712580.524609] latency=nan:nan:nan:nan:nan:(-nan)ms throughput=0rps rr=-nan% cr=-nan% errors=0 total=0
+[1375712581.528668] latency=nan:nan:nan:nan:nan:(-nan)ms throughput=0rps rr=-nan% cr=-nan% errors=0 total=0
+[1375712582.532660] latency=nan:nan:nan:nan:nan:(-nan)ms throughput=0rps rr=-nan% cr=-nan% errors=0 total=0
+[1375712583.536691] latency=nan:nan:nan:nan:nan:(-nan)ms throughput=0rps rr=-nan% cr=-nan% errors=0 total=0
+[1375712583.536964] set thinktime=3.000000
+[1375712583.537031] set concurrency=2000
+[1375712585.116727] latency=2:4:5:7:18:(6)ms throughput=540rps rr=0.00% cr=0.00% errors=0 total=853
+[1375712586.120691] latency=2:3:4:6:14:(5)ms throughput=659rps rr=0.00% cr=0.00% errors=0 total=1515
+[1375712587.124698] latency=2:3:4:6:19:(5)ms throughput=677rps rr=0.00% cr=0.00% errors=0 total=2195
+[1375712588.128681] latency=2:3:4:5:14:(4)ms throughput=658rps rr=0.00% cr=0.00% errors=0 total=2856
+[1375712589.132685] latency=2:3:4:6:20:(4)ms throughput=680rps rr=0.00% cr=0.00% errors=0 total=3539
+[1375712590.136673] latency=2:3:4:5:14:(4)ms throughput=643rps rr=0.00% cr=0.00% errors=0 total=4185
+[1375712591.140680] latency=2:3:4:6:18:(5)ms throughput=666rps rr=0.00% cr=0.00% errors=0 total=4854
+[1375712592.144657] latency=2:3:4:6:23:(5)ms throughput=668rps rr=0.00% cr=0.00% errors=0 total=5525
+[1375712593.148720] latency=2:3:4:6:16:(5)ms throughput=654rps rr=0.00% cr=0.00% errors=0 total=6182
+[1375712594.152660] latency=2:3:4:6:24:(5)ms throughput=669rps rr=0.00% cr=0.00% errors=0 total=6854
+[1375712595.156655] latency=2:3:4:5:19:(5)ms throughput=706rps rr=0.00% cr=0.00% errors=0 total=7563
+[1375712596.160643] latency=2:3:4:6:19:(5)ms throughput=705rps rr=0.00% cr=0.00% errors=0 total=8271
+[1375712597.164650] latency=2:3:4:5:14:(4)ms throughput=646rps rr=0.00% cr=0.00% errors=0 total=8920
+[1375712598.168662] latency=2:3:4:5:14:(4)ms throughput=618rps rr=0.00% cr=0.00% errors=0 total=9540
+[1375712599.172674] latency=2:3:4:6:35:(5)ms throughput=692rps rr=0.00% cr=0.00% errors=0 total=10235
+[1375712600.176647] latency=2:3:4:5:24:(4)ms throughput=717rps rr=0.00% cr=0.00% errors=0 total=10955
+[1375712601.180632] latency=2:3:4:6:15:(5)ms throughput=645rps rr=0.00% cr=0.00% errors=0 total=11603
+[1375712602.184643] latency=2:3:4:6:27:(4)ms throughput=705rps rr=0.00% cr=0.00% errors=0 total=12311
+[1375712603.188636] latency=2:3:4:6:24:(5)ms throughput=667rps rr=0.00% cr=0.00% errors=0 total=12981
+[1375712604.192648] latency=2:3:4:5:16:(4)ms throughput=635rps rr=0.00% cr=0.00% errors=0 total=13619
+[1375712604.193231] set concurrency=2050
+[1375712605.208659] latency=2:3:4:6:21:(5)ms throughput=687rps rr=0.00% cr=0.00% errors=0 total=14317
+[1375712606.212664] latency=2:3:4:6:21:(4)ms throughput=704rps rr=0.00% cr=0.00% errors=0 total=15024
+[1375712607.216657] latency=2:3:4:6:22:(4)ms throughput=663rps rr=0.00% cr=0.00% errors=0 total=15690
+[1375712608.220647] latency=2:3:4:6:19:(4)ms throughput=689rps rr=0.00% cr=0.00% errors=0 total=16382
+[1375712609.224635] latency=2:3:4:5:23:(5)ms throughput=704rps rr=0.00% cr=0.00% errors=0 total=17089
+[1375712610.228637] latency=2:3:4:5:14:(4)ms throughput=655rps rr=0.00% cr=0.00% errors=0 total=17747
+[1375712611.232664] latency=2:3:4:5:25:(5)ms throughput=706rps rr=0.00% cr=0.00% errors=0 total=18456
+[1375712612.236623] latency=2:3:4:6:23:(5)ms throughput=693rps rr=0.00% cr=0.00% errors=0 total=19152
+[1375712613.240639] latency=2:3:4:5:15:(4)ms throughput=643rps rr=0.00% cr=0.00% errors=0 total=19798
+[1375712614.244648] latency=2:3:4:5:34:(5)ms throughput=673rps rr=0.00% cr=0.00% errors=0 total=20474
+[1375712615.248656] latency=2:3:4:5:37:(5)ms throughput=734rps rr=0.00% cr=0.00% errors=0 total=21211
+[1375712616.252632] latency=2:3:4:5:26:(4)ms throughput=666rps rr=0.00% cr=0.00% errors=0 total=21880
+[1375712617.256640] latency=2:3:4:5:17:(4)ms throughput=666rps rr=0.00% cr=0.00% errors=0 total=22549
+[1375712618.260627] latency=2:3:4:5:17:(4)ms throughput=675rps rr=0.00% cr=0.00% errors=0 total=23227
+[1375712619.264639] latency=2:3:4:5:14:(4)ms throughput=655rps rr=0.00% cr=0.00% errors=0 total=23885
+[1375712620.268648] latency=2:3:4:6:26:(5)ms throughput=634rps rr=0.00% cr=0.00% errors=0 total=24522
+[1375712621.272639] latency=2:3:4:5:19:(5)ms throughput=688rps rr=0.00% cr=0.00% errors=0 total=25213
+[1375712622.276634] latency=2:3:4:6:25:(5)ms throughput=686rps rr=0.00% cr=0.00% errors=0 total=25902
+[1375712623.280633] latency=2:3:4:6:27:(4)ms throughput=687rps rr=0.00% cr=0.00% errors=0 total=26592
+[1375712624.284634] latency=2:3:4:5:17:(4)ms throughput=670rps rr=0.00% cr=0.00% errors=0 total=27265
+[1375712624.285243] set concurrency=2100
+[1375712625.300706] latency=2:3:4:6:23:(5)ms throughput=677rps rr=0.00% cr=0.00% errors=0 total=27953
+[1375712626.304659] latency=2:3:4:6:22:(5)ms throughput=701rps rr=0.00% cr=0.00% errors=0 total=28657
+[1375712627.308662] latency=2:3:4:6:31:(5)ms throughput=710rps rr=0.00% cr=0.00% errors=0 total=29370
+[1375712628.312661] latency=2:3:4:6:20:(5)ms throughput=638rps rr=0.00% cr=0.00% errors=0 total=30011
+[1375712629.316656] latency=2:3:4:5:17:(4)ms throughput=676rps rr=0.00% cr=0.00% errors=0 total=30690
+[1375712630.320653] latency=2:3:4:6:18:(5)ms throughput=696rps rr=0.00% cr=0.00% errors=0 total=31389
+[1375712631.324674] latency=2:3:4:6:22:(5)ms throughput=704rps rr=0.00% cr=0.00% errors=0 total=32096
+[1375712632.328659] latency=2:3:4:6:29:(5)ms throughput=684rps rr=0.00% cr=0.00% errors=0 total=32783
+[1375712633.332707] latency=2:3:4:6:24:(5)ms throughput=701rps rr=0.00% cr=0.00% errors=0 total=33487
+[1375712634.336782] latency=2:3:4:6:21:(4)ms throughput=682rps rr=0.00% cr=0.00% errors=0 total=34172
+[1375712635.340872] latency=2:3:4:6:25:(5)ms throughput=698rps rr=0.00% cr=0.00% errors=0 total=34873
+[1375712636.344702] latency=2:3:4:6:24:(5)ms throughput=740rps rr=0.00% cr=0.00% errors=0 total=35616
+[1375712637.348689] latency=2:3:4:6:28:(5)ms throughput=746rps rr=0.00% cr=0.00% errors=0 total=36365
+[1375712638.352705] latency=2:3:4:5:17:(4)ms throughput=699rps rr=0.00% cr=0.00% errors=0 total=37067
+[1375712639.356693] latency=2:3:4:6:22:(5)ms throughput=682rps rr=0.00% cr=0.00% errors=0 total=37752
+[1375712640.360712] latency=2:3:4:6:22:(5)ms throughput=720rps rr=0.00% cr=0.00% errors=0 total=38475
+[1375712641.364692] latency=2:3:4:6:22:(5)ms throughput=688rps rr=0.00% cr=0.00% errors=0 total=39166
+[1375712642.368610] latency=2:3:4:6:39:(5)ms throughput=688rps rr=0.00% cr=0.00% errors=0 total=39857
+[1375712643.372956] latency=2:3:4:6:22:(5)ms throughput=691rps rr=0.00% cr=0.00% errors=0 total=40551
+[1375712644.376767] latency=2:3:4:6:25:(5)ms throughput=700rps rr=0.00% cr=0.00% errors=0 total=41254
+[1375712644.377467] set concurrency=2150
+[1375712645.392725] latency=2:3:4:6:24:(5)ms throughput=712rps rr=0.00% cr=0.00% errors=0 total=41977
+[1375712646.396692] latency=2:3:4:6:27:(5)ms throughput=741rps rr=0.00% cr=0.00% errors=0 total=42721
+[1375712647.400669] latency=2:3:4:6:27:(5)ms throughput=720rps rr=0.00% cr=0.00% errors=0 total=43444
+[1375712648.404624] latency=2:3:4:6:17:(5)ms throughput=694rps rr=0.00% cr=0.00% errors=0 total=44141
+[1375712649.408676] latency=2:3:4:6:25:(5)ms throughput=698rps rr=0.00% cr=0.00% errors=0 total=44842
+[1375712650.412637] latency=2:3:4:6:14:(4)ms throughput=707rps rr=0.00% cr=0.00% errors=0 total=45552
+[1375712651.416751] latency=2:3:4:6:24:(5)ms throughput=728rps rr=0.00% cr=0.00% errors=0 total=46283
+[1375712652.420666] latency=2:3:4:6:25:(5)ms throughput=740rps rr=0.00% cr=0.00% errors=0 total=47026
+[1375712653.424831] latency=2:3:4:6:26:(5)ms throughput=779rps rr=0.00% cr=0.00% errors=0 total=47808
+[1375712654.428657] latency=2:3:4:5:20:(4)ms throughput=740rps rr=0.00% cr=0.00% errors=0 total=48551
+[1375712655.432617] latency=2:2:4:5:26:(4)ms throughput=693rps rr=0.00% cr=0.00% errors=0 total=49247
+[1375712656.436644] latency=2:3:4:6:18:(5)ms throughput=709rps rr=0.00% cr=0.00% errors=0 total=49959
+[1375712657.440653] latency=2:3:4:5:17:(4)ms throughput=755rps rr=0.00% cr=0.00% errors=0 total=50717
+[1375712658.444684] latency=2:3:4:6:13:(4)ms throughput=670rps rr=0.00% cr=0.00% errors=0 total=51390
+[1375712659.448673] latency=2:3:4:5:16:(4)ms throughput=705rps rr=0.00% cr=0.00% errors=0 total=52098
+[1375712660.452641] latency=2:3:4:6:23:(4)ms throughput=691rps rr=0.00% cr=0.00% errors=0 total=52792
+[1375712661.456641] latency=2:3:4:5:24:(4)ms throughput=731rps rr=0.00% cr=0.00% errors=0 total=53526
+[1375712662.460662] latency=2:3:4:5:29:(5)ms throughput=708rps rr=0.00% cr=0.00% errors=0 total=54237
+[1375712663.464682] latency=2:3:4:6:20:(5)ms throughput=635rps rr=0.00% cr=0.00% errors=0 total=54875
+[1375712664.468671] latency=2:3:4:5:15:(4)ms throughput=675rps rr=0.00% cr=0.00% errors=0 total=55553
+[1375712664.469332] set concurrency=2200
+[1375712665.484757] latency=2:3:4:6:25:(5)ms throughput=770rps rr=0.00% cr=0.00% errors=0 total=56335
+[1375712666.488696] latency=2:3:4:5:22:(4)ms throughput=743rps rr=0.00% cr=0.00% errors=0 total=57081
+[1375712667.492654] latency=2:3:4:5:19:(4)ms throughput=712rps rr=0.00% cr=0.00% errors=0 total=57796
+[1375712668.496682] latency=2:3:4:5:25:(4)ms throughput=757rps rr=0.00% cr=0.00% errors=0 total=58556
+[1375712669.500686] latency=2:3:4:6:22:(5)ms throughput=729rps rr=0.00% cr=0.00% errors=0 total=59288
+[1375712670.504677] latency=2:3:4:5:19:(4)ms throughput=696rps rr=0.00% cr=0.00% errors=0 total=59987
+[1375712671.508710] latency=2:3:4:6:21:(5)ms throughput=720rps rr=0.00% cr=0.00% errors=0 total=60710
+[1375712672.512670] latency=2:3:4:6:44:(5)ms throughput=767rps rr=0.00% cr=0.00% errors=0 total=61480
+[1375712673.516702] latency=2:3:4:5:19:(5)ms throughput=677rps rr=0.00% cr=0.00% errors=0 total=62160
+[1375712674.520678] latency=2:3:4:5:14:(4)ms throughput=711rps rr=0.00% cr=0.00% errors=0 total=62874
+[1375712675.524661] latency=2:3:4:5:19:(4)ms throughput=732rps rr=0.00% cr=0.00% errors=0 total=63609
+[1375712676.528696] latency=2:2:4:6:43:(5)ms throughput=791rps rr=0.00% cr=0.00% errors=0 total=64403
+[1375712677.532703] latency=2:3:4:6:74:(6)ms throughput=706rps rr=0.00% cr=0.00% errors=0 total=65112
+[1375712678.536640] latency=2:3:4:6:37:(5)ms throughput=763rps rr=0.00% cr=0.00% errors=0 total=65878
+[1375712679.540695] latency=2:3:4:6:37:(5)ms throughput=753rps rr=0.00% cr=0.00% errors=0 total=66634
+[1375712680.544630] latency=2:3:4:6:43:(6)ms throughput=703rps rr=0.00% cr=0.00% errors=0 total=67340
+[1375712681.548661] latency=2:3:4:7:107:(10)ms throughput=772rps rr=0.00% cr=0.00% errors=0 total=68115
+[1375712682.552708] latency=2:3:4:6:81:(7)ms throughput=746rps rr=0.00% cr=0.00% errors=0 total=68864
+[1375712683.556716] latency=2:3:4:6:78:(6)ms throughput=726rps rr=0.00% cr=0.00% errors=0 total=69593
+[1375712683.557223] set concurrency=2250
+[1375712684.568742] latency=2:3:4:6:45:(6)ms throughput=767rps rr=0.00% cr=0.00% errors=0 total=70369
+[1375712685.572697] latency=2:3:4:7:159:(19)ms throughput=692rps rr=0.00% cr=0.00% errors=0 total=71064
+[1375712686.576697] latency=2:3:4:6:81:(6)ms throughput=694rps rr=0.00% cr=0.00% errors=0 total=71761
+[1375712687.580711] latency=2:3:4:6:75:(7)ms throughput=740rps rr=0.00% cr=0.00% errors=0 total=72504
+[1375712688.584745] latency=2:3:4:8:147:(18)ms throughput=799rps rr=0.00% cr=0.00% errors=0 total=73306
+[1375712689.588670] latency=2:3:4:8:173:(23)ms throughput=766rps rr=0.00% cr=0.00% errors=0 total=74075
+[1375712690.592860] latency=2:2:4:7:298:(45)ms throughput=690rps rr=0.00% cr=0.00% errors=0 total=74768
+[1375712691.596666] latency=2:3:4:8:287:(43)ms throughput=722rps rr=0.00% cr=0.00% errors=0 total=75493
+[1375712692.600723] latency=2:3:4:8:211:(30)ms throughput=739rps rr=0.00% cr=0.00% errors=0 total=76235
+[1375712693.604666] latency=2:3:4:8:325:(51)ms throughput=690rps rr=0.00% cr=0.00% errors=0 total=76928
+[1375712694.608698] latency=2:3:4:8:368:(55)ms throughput=743rps rr=0.00% cr=0.00% errors=0 total=77674
+[1375712695.612672] latency=2:3:4:8:297:(41)ms throughput=730rps rr=0.00% cr=0.00% errors=0 total=78407
+[1375712696.616684] latency=2:3:4:9:149:(13)ms throughput=750rps rr=0.00% cr=0.00% errors=0 total=79160
+[1375712697.620690] latency=2:3:5:8:229:(19)ms throughput=757rps rr=0.00% cr=0.00% errors=0 total=79920
+[1375712698.624910] latency=2:3:4:9:129:(14)ms throughput=696rps rr=0.00% cr=0.00% errors=0 total=80619
+[1375712699.628839] latency=2:3:4:8:183:(29)ms throughput=748rps rr=0.00% cr=0.00% errors=0 total=81370
+[1375712700.632655] latency=2:3:4:8:382:(51)ms throughput=710rps rr=0.00% cr=0.00% errors=0 total=82083
+[1375712701.636713] latency=2:3:5:11:407:(60)ms throughput=747rps rr=0.00% cr=0.00% errors=0 total=82833
+[1375712702.640651] latency=2:3:4:7:524:(88)ms throughput=707rps rr=0.00% cr=0.00% errors=0 total=83543
+[1375712703.644673] latency=2:3:4:9:422:(79)ms throughput=755rps rr=0.00% cr=0.00% errors=0 total=84301
+[1375712703.645368] set concurrency=2300
+[1375712704.656687] latency=2:3:4:7:377:(64)ms throughput=708rps rr=0.00% cr=0.00% errors=0 total=85018
+[1375712705.660665] latency=2:3:5:8:413:(70)ms throughput=723rps rr=0.00% cr=0.00% errors=0 total=85744
+[1375712706.664690] latency=2:3:5:8:431:(67)ms throughput=792rps rr=0.00% cr=0.00% errors=0 total=86539
+[1375712707.668659] latency=2:3:5:9:528:(93)ms throughput=724rps rr=0.00% cr=0.00% errors=0 total=87266
+[1375712708.672696] latency=2:3:4:7:545:(92)ms throughput=758rps rr=0.00% cr=0.00% errors=0 total=88027
+[1375712709.676675] latency=2:3:5:9:694:(117)ms throughput=728rps rr=0.00% cr=0.00% errors=0 total=88758
+[1375712710.680691] latency=2:3:4:8:875:(124)ms throughput=732rps rr=0.00% cr=0.00% errors=0 total=89493
+[1375712711.684725] latency=2:3:4:8:876:(145)ms throughput=806rps rr=0.00% cr=0.00% errors=0 total=90302
+[1375712712.688677] latency=2:3:4:7:840:(141)ms throughput=716rps rr=0.00% cr=0.00% errors=0 total=91021
+[1375712713.692613] latency=2:3:4:8:820:(142)ms throughput=728rps rr=0.00% cr=0.00% errors=0 total=91752
+[1375712714.696668] latency=2:3:4:9:726:(135)ms throughput=734rps rr=0.00% cr=0.00% errors=0 total=92489
+[1375712715.700680] latency=2:3:5:8:795:(129)ms throughput=709rps rr=0.00% cr=0.00% errors=0 total=93201
+[1375712716.704677] latency=2:3:4:8:907:(144)ms throughput=728rps rr=0.00% cr=0.00% errors=0 total=93932
+[1375712717.708695] latency=2:3:5:10:785:(128)ms throughput=731rps rr=0.00% cr=0.00% errors=0 total=94666
+[1375712718.712694] latency=2:3:5:9:748:(126)ms throughput=767rps rr=0.00% cr=0.00% errors=0 total=95436
+[1375712719.716645] latency=2:3:4:8:774:(132)ms throughput=750rps rr=0.00% cr=0.00% errors=0 total=96189
+[1375712720.720674] latency=2:3:4:8:735:(122)ms throughput=758rps rr=0.00% cr=0.00% errors=0 total=96950
+[1375712721.724688] latency=2:3:4:9:460:(89)ms throughput=700rps rr=0.00% cr=0.00% errors=0 total=97653
+[1375712722.728704] latency=2:3:4:8:511:(86)ms throughput=732rps rr=0.00% cr=0.00% errors=0 total=98388
+[1375712723.732695] latency=2:3:4:8:562:(90)ms throughput=793rps rr=0.00% cr=0.00% errors=0 total=99184
+[1375712723.733423] set concurrency=2350
+[1375712724.748776] latency=2:3:4:8:676:(115)ms throughput=716rps rr=0.00% cr=0.00% errors=0 total=99912
+[1375712725.752684] latency=2:3:5:8:742:(135)ms throughput=701rps rr=0.00% cr=0.00% errors=0 total=100616
+[1375712726.756713] latency=2:3:4:8:823:(148)ms throughput=742rps rr=0.00% cr=0.00% errors=0 total=101361
+[1375712727.760746] latency=2:3:4:9:831:(154)ms throughput=755rps rr=0.00% cr=0.00% errors=0 total=102119
+[1375712728.764711] latency=2:3:4:8:953:(161)ms throughput=774rps rr=0.00% cr=0.00% errors=0 total=102896
+[1375712729.768746] latency=2:3:5:8:1147:(163)ms throughput=791rps rr=0.00% cr=0.00% errors=0 total=103690
+[1375712730.772681] latency=2:3:5:8:2587:(179)ms throughput=717rps rr=0.00% cr=0.00% errors=0 total=104410
+[1375712731.776712] latency=2:3:5:8:2025:(182)ms throughput=730rps rr=0.00% cr=0.00% errors=0 total=105143
+[1375712732.780735] latency=2:3:4:8:2274:(193)ms throughput=762rps rr=0.00% cr=0.00% errors=0 total=105908
+[1375712733.784675] latency=2:3:5:7:1920:(162)ms throughput=727rps rr=0.00% cr=0.00% errors=0 total=106638
+[1375712734.788687] latency=2:3:4:8:4043:(237)ms throughput=750rps rr=0.00% cr=0.00% errors=0 total=107391
+[1375712735.792663] latency=2:3:4:8:3893:(201)ms throughput=730rps rr=0.00% cr=0.00% errors=0 total=108124
+[1375712736.796669] latency=2:3:5:10:7895:(228)ms throughput=759rps rr=0.00% cr=0.00% errors=0 total=108886
+[1375712737.800674] latency=2:3:4:7:3984:(174)ms throughput=708rps rr=0.00% cr=0.00% errors=0 total=109597
+[1375712738.804672] latency=2:3:5:11:7943:(215)ms throughput=739rps rr=0.00% cr=0.00% errors=0 total=110339
+[1375712739.808656] latency=2:3:4:10:3878:(197)ms throughput=699rps rr=0.00% cr=0.00% errors=0 total=111041
+[1375712740.812657] latency=2:3:5:9:7986:(227)ms throughput=683rps rr=0.00% cr=0.00% errors=0 total=111727
+error: Timeout was reached
+[1375712741.816639] latency=2:3:4:10:10011:(230)ms throughput=749rps rr=0.00% cr=0.00% errors=1 total=112479
+[1375712742.820642] latency=2:3:4:9:3785:(185)ms throughput=711rps rr=0.00% cr=0.00% errors=0 total=113193
+[1375712743.824649] latency=2:3:4:8:3748:(148)ms throughput=796rps rr=0.00% cr=0.00% errors=0 total=113992
+[1375712743.825370] set concurrency=2400
+[1375712744.840720] latency=2:3:4:8:828:(149)ms throughput=744rps rr=0.00% cr=0.00% errors=0 total=114748
+[1375712745.844646] latency=2:3:4:7:1106:(161)ms throughput=704rps rr=0.00% cr=0.00% errors=0 total=115455
+[1375712746.848668] latency=2:3:4:9:1140:(198)ms throughput=719rps rr=0.00% cr=0.00% errors=0 total=116177
+[1375712747.852668] latency=2:3:4:9:1836:(175)ms throughput=717rps rr=0.00% cr=0.00% errors=0 total=116897
+[1375712748.856685] latency=2:3:4:9:2580:(211)ms throughput=725rps rr=0.00% cr=0.00% errors=0 total=117625
+[1375712749.860643] latency=2:3:4:8:4116:(213)ms throughput=720rps rr=0.00% cr=0.00% errors=0 total=118348
+[1375712750.864653] latency=2:3:4:10:4418:(232)ms throughput=751rps rr=0.00% cr=0.00% errors=0 total=119102
+[1375712751.868710] latency=2:3:4:7:3911:(202)ms throughput=765rps rr=0.00% cr=0.00% errors=0 total=119870
+[1375712752.872937] latency=2:3:4:7:3964:(207)ms throughput=759rps rr=0.00% cr=0.00% errors=0 total=120632
+[1375712753.876607] latency=2:3:4:7:7932:(238)ms throughput=778rps rr=0.00% cr=0.00% errors=0 total=121413
+[1375712754.880687] latency=2:3:4:7:8177:(240)ms throughput=754rps rr=0.00% cr=0.00% errors=0 total=122170
+[1375712755.884622] latency=2:3:4:8:3997:(243)ms throughput=712rps rr=0.00% cr=0.00% errors=0 total=122885
+error: Timeout was reached
+error: Timeout was reached
+[1375712756.888663] latency=2:3:4:8:10010:(281)ms throughput=715rps rr=0.00% cr=0.00% errors=2 total=123603
+[1375712757.892688] latency=2:3:4:8:3917:(224)ms throughput=746rps rr=0.00% cr=0.00% errors=0 total=124352
+error: Timeout was reached
+[1375712758.896664] latency=2:3:4:8:10010:(240)ms throughput=773rps rr=0.00% cr=0.00% errors=1 total=125128
+error: Timeout was reached
+[1375712759.900668] latency=2:3:4:8:10010:(262)ms throughput=723rps rr=0.00% cr=0.00% errors=1 total=125854
+[1375712760.904693] latency=2:3:5:8:8098:(247)ms throughput=718rps rr=0.00% cr=0.00% errors=0 total=126575
+[1375712761.908688] latency=2:3:5:8:8204:(247)ms throughput=751rps rr=0.00% cr=0.00% errors=0 total=127329
+error: Timeout was reached
+[1375712762.912647] latency=2:3:4:9:10009:(259)ms throughput=743rps rr=0.00% cr=0.00% errors=1 total=128075
+error: Timeout was reached
+error: Timeout was reached
+[1375712763.916667] latency=2:3:5:8:10011:(277)ms throughput=746rps rr=0.00% cr=0.00% errors=2 total=128824
+[1375712763.917363] set concurrency=2450
+error: Timeout was reached
+[1375712764.932731] latency=2:3:5:8:10008:(255)ms throughput=701rps rr=0.00% cr=0.00% errors=1 total=129536
+[1375712765.936690] latency=2:3:4:8:8024:(240)ms throughput=738rps rr=0.00% cr=0.00% errors=0 total=130277
+error: Timeout was reached
+error: Timeout was reached
+[1375712766.940684] latency=2:3:4:8:10011:(241)ms throughput=743rps rr=0.00% cr=0.00% errors=2 total=131023
+[1375712767.948682] latency=2:3:5:9:8128:(246)ms throughput=708rps rr=0.00% cr=0.00% errors=0 total=131737
+[1375712768.952685] latency=2:3:4:8:7907:(272)ms throughput=734rps rr=0.00% cr=0.00% errors=0 total=132474
+error: Timeout was reached
+error: Timeout was reached
+[1375712769.956674] latency=2:3:4:9:10012:(324)ms throughput=760rps rr=0.00% cr=0.00% errors=2 total=133237
+error: Timeout was reached
+[1375712770.960684] latency=2:3:5:8:10008:(292)ms throughput=778rps rr=0.00% cr=0.00% errors=1 total=134018
+[1375712771.964670] latency=2:3:5:8:8177:(319)ms throughput=743rps rr=0.00% cr=0.00% errors=0 total=134764
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712772.968666] latency=2:3:4:7:10012:(364)ms throughput=690rps rr=0.00% cr=0.00% errors=6 total=135457
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712773.972697] latency=2:3:5:8:10009:(315)ms throughput=733rps rr=0.00% cr=0.00% errors=3 total=136193
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712774.976698] latency=2:3:5:9:10012:(325)ms throughput=752rps rr=0.00% cr=0.00% errors=4 total=136948
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712775.980674] latency=2:3:4:7:10010:(307)ms throughput=715rps rr=0.00% cr=0.00% errors=3 total=137666
+error: Timeout was reached
+[1375712776.984679] latency=2:3:4:8:10008:(296)ms throughput=735rps rr=0.00% cr=0.00% errors=1 total=138404
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712777.988668] latency=2:3:5:11:10010:(314)ms throughput=724rps rr=0.00% cr=0.00% errors=3 total=139131
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712778.992661] latency=2:3:4:8:10011:(314)ms throughput=745rps rr=0.00% cr=0.00% errors=3 total=139879
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712779.996700] latency=2:3:5:9:10011:(342)ms throughput=708rps rr=0.00% cr=0.00% errors=4 total=140590
+error: Timeout was reached
+[1375712781.000678] latency=2:3:4:10:10011:(295)ms throughput=734rps rr=0.00% cr=0.00% errors=1 total=141327
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712782.004694] latency=2:3:5:8:10011:(328)ms throughput=756rps rr=0.00% cr=0.00% errors=4 total=142086
+error: Timeout was reached
+error: Timeout was reached
+[1375712783.008704] latency=2:3:5:8:10008:(358)ms throughput=713rps rr=0.00% cr=0.00% errors=2 total=142802
+error: Timeout was reached
+[1375712784.012681] latency=2:3:5:9:10011:(300)ms throughput=697rps rr=0.00% cr=0.00% errors=1 total=143502
+[1375712784.013364] set concurrency=2500
+error: Timeout was reached
+error: Timeout was reached
+[1375712785.028719] latency=2:3:4:8:10007:(251)ms throughput=754rps rr=0.00% cr=0.00% errors=2 total=144268
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712786.032764] latency=2:3:4:9:10010:(374)ms throughput=732rps rr=0.00% cr=0.00% errors=7 total=145003
+error: Timeout was reached
+[1375712787.036682] latency=2:3:4:7:10012:(268)ms throughput=731rps rr=0.00% cr=0.00% errors=1 total=145737
+[1375712788.040725] latency=2:3:4:9:9318:(291)ms throughput=752rps rr=0.00% cr=0.00% errors=0 total=146492
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712789.044684] latency=2:3:5:9:10009:(320)ms throughput=752rps rr=0.00% cr=0.00% errors=4 total=147247
+error: Timeout was reached
+error: Timeout was reached
+[1375712790.048681] latency=2:3:4:8:10011:(349)ms throughput=733rps rr=0.00% cr=0.00% errors=2 total=147983
+error: Timeout was reached
+[1375712791.052654] latency=2:3:4:7:10011:(257)ms throughput=726rps rr=0.00% cr=0.00% errors=1 total=148712
+error: Timeout was reached
+error: Timeout was reached
+[1375712792.056663] latency=2:3:4:8:10012:(296)ms throughput=757rps rr=0.00% cr=0.00% errors=2 total=149472
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712793.060670] latency=2:3:4:8:10009:(417)ms throughput=733rps rr=0.00% cr=0.00% errors=4 total=150208
+[1375712794.064659] latency=2:3:4:8:8172:(313)ms throughput=763rps rr=0.00% cr=0.00% errors=0 total=150974
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712795.068670] latency=2:3:4:8:10012:(401)ms throughput=733rps rr=0.00% cr=0.00% errors=8 total=151710
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712796.072659] latency=2:3:5:8:10012:(370)ms throughput=753rps rr=0.00% cr=0.00% errors=4 total=152466
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712797.076650] latency=2:3:5:9:10009:(400)ms throughput=767rps rr=0.00% cr=0.00% errors=3 total=153236
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712798.080654] latency=2:3:5:8:10011:(358)ms throughput=738rps rr=0.00% cr=0.00% errors=4 total=153977
+error: Timeout was reached
+error: Timeout was reached
+[1375712799.084696] latency=2:3:5:8:10011:(322)ms throughput=730rps rr=0.00% cr=0.00% errors=2 total=154710
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712800.088676] latency=2:3:4:8:10011:(430)ms throughput=745rps rr=0.00% cr=0.00% errors=4 total=155458
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712801.092668] latency=2:3:4:8:10011:(420)ms throughput=778rps rr=0.00% cr=0.00% errors=6 total=156239
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712802.096663] latency=2:3:5:8:10011:(392)ms throughput=760rps rr=0.00% cr=0.00% errors=6 total=157002
+[1375712803.100650] latency=2:3:5:9:8067:(333)ms throughput=693rps rr=0.00% cr=0.00% errors=0 total=157698
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375712804.104698] latency=2:3:4:8:10011:(424)ms throughput=702rps rr=0.00% cr=0.00% errors=6 total=158403
+error: Timeout was reached
