@@ -675,3 +675,23 @@ error: Timeout was reached
 error: Timeout was reached
 error: Timeout was reached
 error: Timeout was reached
+[1375716114.708691] latency=10000:10001:10002:10002:10002:(10001)ms throughput=14rps rr=0.00% cr=0.00% errors=14 total=7361
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375716115.712706] latency=2913:4785:10001:10002:10002:(8201)ms throughput=10rps rr=30.00% cr=0.00% errors=7 total=7371
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+error: Timeout was reached
+[1375716116.716682] latency=10000:10001:10002:10002:10002:(10001)ms throughput=8rps rr=0.00% cr=0.00% errors=8 total=7379
+error: Timeout was reached
+error: Timeout was reached
