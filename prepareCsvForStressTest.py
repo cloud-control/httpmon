@@ -69,8 +69,10 @@ def getClientTimeSeries(lines):
 			throughput = float(re.search("throughput=([0-9.]+)rps", line).group(1))
 
 			timestamp = int(timestamp)
-			timeseries[timestamp]['latency'] = maxLatency / 1000.0
-			timeseries[timestamp]['serviceLevel'] = rr / 100.0
+			timeseries[timestamp]['minLatency'] = minLatency / 1000.0
+			timeseries[timestamp]['avgLatency'] = avgLatency / 1000.0
+			timeseries[timestamp]['maxLatency'] = maxLatency / 1000.0
+			timeseries[timestamp]['rr'] = rr / 100.0
 			timeseries[timestamp]['throughput'] = throughput
 		except AttributeError:
 			try:
@@ -178,18 +180,46 @@ for line in expLogLines:
 tEnd = max(timeseries.iterkeys())
 
 #
+# Mark transitory periods
+#
+transitoryTimestamps = set()
+lastConcurrency, lastCap = 0, 0
+for timestamp, keyvalues in sorted(timeseries.iteritems()):
+	currentConcurrency = keyvalues.get('client_concurrency', 0)
+	if lastConcurrency != currentConcurrency:
+		lastConcurrency = currentConcurrency
+		for t in range(timestamp, timestamp + 30):
+			transitoryTimestamps.add(t)
+
+	currentCap = keyvalues.get('exp_cap', 0)
+	if lastCap != currentCap:
+		lastCap = currentCap
+		for t in range(timestamp, timestamp + 30):
+			transitoryTimestamps.add(t)
+
+print('\n'.join([str(x) for x in transitoryTimestamps]))
+
+#
 # Aggregate results
 #
 tz = defaultdict(lambda: defaultdict(lambda: []))
 for timestamp, keyvalues in timeseries.iteritems():
+	if timestamp in transitoryTimestamps:
+		continue
 	try:
 		cap = keyvalues['exp_cap']
 		concurrency = keyvalues['exp_concurrency']
 		throughput = keyvalues['client_throughput']
-		maxLatency = keyvalues['client_latency']
+		minLatency = keyvalues['client_minLatency']
+		avgLatency = keyvalues['client_avgLatency']
+		maxLatency = keyvalues['client_maxLatency']
+		rr = keyvalues['client_rr']
 
 		tz[(cap, concurrency)]['throughput'].append(throughput)
-		tz[(cap, concurrency)]['latency'].append(maxLatency)
+		tz[(cap, concurrency)]['minLatency'].append(minLatency)
+		tz[(cap, concurrency)]['avgLatency'].append(avgLatency)
+		tz[(cap, concurrency)]['maxLatency'].append(maxLatency)
+		tz[(cap, concurrency)]['rr'].append(rr)
 	except KeyError:
 		print('Missing data for timestamp {0}'.format(timestamp), file = stderr)
 
@@ -201,5 +231,11 @@ if options.output is None:
 else:
 	f = open(options.output, 'w')
 print("# Generated using: " + ' '.join(argv), file = f)
-for cap, concurrency in sorted(tz):
-	print(cap, concurrency, avg(tz[(cap, concurrency)]['throughput']), max(tz[(cap, concurrency)]['latency']), sep = ',')
+for cap, concurrency in sorted(tz, key = lambda (cap, concurrency): (-cap, concurrency)):
+	print(cap, concurrency, \
+		avg(tz[(cap, concurrency)]['throughput']),
+		min(tz[(cap, concurrency)]['minLatency']),
+		avg(tz[(cap, concurrency)]['avgLatency']),
+		max(tz[(cap, concurrency)]['maxLatency']),
+		avg(tz[(cap, concurrency)]['rr']), \
+		sep = ',')
