@@ -59,21 +59,27 @@ def addEchoToTimeSeries(series):
 
 def getClientTimeSeries(lines):
 	timeseries = defaultdict(lambda: {})
+	lastTotal = 0
+	lastTimestamp = 0
 	for line in lines:
 		try:
-			timestamp = float(re.search("\[([0-9.]+)\]", line).group(1))
+			hpTimestamp = float(re.search("\[([0-9.]+)\]", line).group(1))
 			avgLatency = float(re.search("latency=[0-9.]+:[0-9.]+:[0-9.]+:[0-9.]+:[0-9.]+:\(([0-9.]+)\)", line).group(1))
 			minLatency = float(re.search("latency=([0-9.]+):[0-9.]+:[0-9.]+:[0-9.]+:[0-9.]+:\([0-9.]+\)", line).group(1))
 			maxLatency = float(re.search("latency=[0-9.]+:[0-9.]+:[0-9.]+:[0-9.]+:([0-9.]+):\([0-9.]+\)", line).group(1))
 			rr = float(re.search("rr=([0-9.]+)", line).group(1))
-			throughput = float(re.search("throughput=([0-9.]+)rps", line).group(1))
+			errors = int(re.search("errors=([0-9.]+)", line).group(1))
+			total = int(re.search("total=([0-9.]+)", line).group(1))
 
-			timestamp = int(timestamp)
+			timestamp = int(hpTimestamp)
 			timeseries[timestamp]['minLatency'] = minLatency / 1000.0
 			timeseries[timestamp]['avgLatency'] = avgLatency / 1000.0
 			timeseries[timestamp]['maxLatency'] = maxLatency / 1000.0
 			timeseries[timestamp]['rr'] = rr / 100.0
-			timeseries[timestamp]['throughput'] = throughput
+			timeseries[timestamp]['throughput'] = (total - lastTotal - errors) / (hpTimestamp - lastTimestamp)
+
+			lastTotal = total
+			lastTimestamp = hpTimestamp
 		except AttributeError:
 			try:
 				m = re.search("\[([0-9.]+)\] set (.*)=(.*)", line)
