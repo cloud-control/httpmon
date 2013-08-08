@@ -197,8 +197,6 @@ for timestamp, keyvalues in sorted(timeseries.iteritems()):
 		for t in range(timestamp, timestamp + 30):
 			transitoryTimestamps.add(t)
 
-print('\n'.join([str(x) for x in transitoryTimestamps]))
-
 #
 # Aggregate results
 #
