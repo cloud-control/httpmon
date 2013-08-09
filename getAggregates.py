@@ -23,7 +23,7 @@ def stats(a):
 #
 # Process command-line
 #
-parser = OptionParser()
+parser = OptionParser(usage = "usage: %prog DIRECTORIES...")
 (options, args) = parser.parse_args()
 
 totalRecommendationsForController = defaultdict(lambda: [])
