@@ -27,7 +27,7 @@ parser = OptionParser(usage = "usage: %prog DIRECTORIES...")
 (options, args) = parser.parse_args()
 
 totalRecommendationsForController = defaultdict(lambda: [])
-totalNonRecommendationsForController = defaultdict(lambda: [])
+totalSuccessfulRequestsForController = defaultdict(lambda: [])
 
 for directory in args:
 	#
@@ -81,11 +81,11 @@ for directory in args:
 			print("Ignoring line {0}".format(line.strip()), file = stderr)
 	
 	totalRecommendationsForController[(pole, serviceLevel)].append(totalRecommendations)
-	totalNonRecommendationsForController[(pole, serviceLevel)].append(totalRequests - totalErrors - totalRecommendations)
+	totalSuccessfulRequestsForController[(pole, serviceLevel)].append(totalRequests - totalErrors)
 
 #
 # Output results
 #
 print("% Generated using: " + ' '.join(argv))
 for pole, serviceLevel in sorted(totalRecommendationsForController):
-	print(pole, serviceLevel, *stats(totalRecommendationsForController[(pole, serviceLevel)]) +stats(totalNonRecommendationsForController[(pole, serviceLevel)]), sep = ',')
+	print(pole, serviceLevel, *stats(totalRecommendationsForController[(pole, serviceLevel)]) +stats(totalSuccessfulRequestsForController[(pole, serviceLevel)]), sep = ',')
