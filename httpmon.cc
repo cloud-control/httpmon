@@ -76,6 +76,23 @@ std::array<typename T::value_type, 5> quartiles(T &a)
 }
 
 template<typename T>
+std::array<typename T::value_type, 2> percentiles(T &a)
+{
+	/* return value: 95 percentile, 99 percentile */
+	std::array<typename T::value_type, 2> ret = {{ NAN, NAN }};
+
+	size_t n = a.size();
+	if (n < 1)
+		return ret;
+	std::sort(a.begin(), a.end());
+
+	ret[0] = median(a.begin() + 90 * n / 100, a.end());
+	ret[1] = median(a.begin() + 98 * n / 100, a.end());
+
+	return ret;
+}
+
+template<typename T>
 double average(const T &a)
 {
 	double sum = std::accumulate(a.begin(), a.end(), 0.0);
@@ -186,10 +203,11 @@ void report(HttpClientControl &control, double &lastReportTime, int &totalReques
 	double recommendationRate = (double)numOptionalStuff1 / latencies.size();
 	double commentRate = (double)numOptionalStuff2 / latencies.size();
 	auto latencyQuartiles = quartiles(latencies);
+	auto latencyPercentiles = percentiles(latencies);
 	lastReportTime = reportTime;
 	totalRequests += latencies.size();
 
-	fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms throughput=%.0frps rr=%.2f%% cr=%.2f%% errors=%d total=%d\n",
+	fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms latency95=%.0fms latency99=%.0fms throughput=%.0frps rr=%.2f%% cr=%.2f%% errors=%d total=%d\n",
 		reportTime,
 		latencyQuartiles[0] * 1000,
 		latencyQuartiles[1] * 1000,
@@ -197,6 +215,8 @@ void report(HttpClientControl &control, double &lastReportTime, int &totalReques
 		latencyQuartiles[3] * 1000,
 		latencyQuartiles[4] * 1000,
 		average(latencies) * 1000,
+		latencyPercentiles[0] * 1000,
+		latencyPercentiles[1] * 1000,
 		throughput,
 		recommendationRate * 100,
 		commentRate * 100,
