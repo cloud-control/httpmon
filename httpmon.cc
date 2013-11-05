@@ -129,7 +129,9 @@ int httpClientMain(int id, HttpClientControl &control)
 
 	rng.seed(now() + id);
 
-	while (control.running) {
+	try { /* boost::thread_interrupted */
+
+	while (true) {
 		/* Check to see if paramaters have changed and update distribution */
 		if (lastThinkTime != control.thinkTime) {
 			lastThinkTime = control.thinkTime;
@@ -170,6 +172,11 @@ int httpClientMain(int id, HttpClientControl &control)
 		/* If an error has occured, we might spin and lock "control" */
 		if (error)
 			usleep(0);
+	}
+
+	}
+	catch (boost::thread_interrupted) {
+		/* Ignore exception and exit gracefully */
 	}
 	curl_easy_cleanup(curl);
 
