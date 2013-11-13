@@ -4,7 +4,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <boost/program_options.hpp>
-#include <boost/thread.hpp>
+#include <chrono>
 #include <curl/curl.h>
 #include <fcntl.h>
 #include <mutex>
@@ -112,6 +112,12 @@ size_t nullWriter(char *ptr, size_t size, size_t nmemb, void *userdata)
 
 int httpClientMain(int id, HttpClientControl &control)
 {
+	/* Block SIGUSR2 */
+	sigset_t sigset;
+	sigemptyset(&sigset);
+	sigaddset(&sigset, SIGUSR2);
+	pthread_sigmask(SIG_BLOCK, &sigset, NULL);
+
 	uint32_t optionalStuff;
 
 	CURL *curl = curl_easy_init();
@@ -129,8 +135,6 @@ int httpClientMain(int id, HttpClientControl &control)
 
 	rng.seed(now() + id);
 
-	try { /* boost::thread_interrupted */
-
 	while (true) {
 		/* Check to see if paramaters have changed and update distribution */
 		if (lastThinkTime != control.thinkTime) {
@@ -142,11 +146,12 @@ int httpClientMain(int id, HttpClientControl &control)
 		/* We make sure that we first wait, then initiate the first connection
 		 * to avoid spiky transient effects */ 
 		if (control.thinkTime > 0) {
-			using boost::this_thread::sleep;
-			using boost::posix_time::microsec;
+			double interval = waitDistribution(rng);
+			struct timespec timeout = { int(interval), int((interval-(int)interval) * NanoSecondsInASecond)};
+			int signo = sigtimedwait(&sigset, NULL, &timeout);
 
-			double wait = waitDistribution(rng);
-			sleep(microsec(wait * MicroSecondsInASecond));
+			if (signo > 0)
+				break; /* master thread asked us to exit */
 		}
 
 
@@ -174,10 +179,6 @@ int httpClientMain(int id, HttpClientControl &control)
 			usleep(0);
 	}
 
-	}
-	catch (boost::thread_interrupted) {
-		/* Ignore exception and exit gracefully */
-	}
 	curl_easy_cleanup(curl);
 
 	return 0;
@@ -340,9 +341,9 @@ int main(int argc, char **argv)
 	control.concurrency = concurrency;
 
 	/* Start client threads */
-	std::vector<boost::thread> httpClientThreads;
+	std::vector<std::thread> httpClientThreads;
 	for (int i = 0; i < concurrency; i++) {
-		httpClientThreads.push_back(boost::thread(httpClientMain, i, std::ref(control)));
+		httpClientThreads.emplace_back(httpClientMain, i, std::ref(control));
 	}
 
 	/*
@@ -378,10 +379,10 @@ int main(int argc, char **argv)
 
 		/* Check if requested concurrency increased */
 		while ((int)httpClientThreads.size() < control.concurrency)
-			httpClientThreads.push_back(boost::thread(httpClientMain, httpClientThreads.size(), std::ref(control)));
+			httpClientThreads.emplace_back(httpClientMain, httpClientThreads.size(), std::ref(control));
 		/* Check if requested concurrency decreased */
 		while ((int)httpClientThreads.size() > control.concurrency) {
-			httpClientThreads.back().interrupt();
+			pthread_kill(httpClientThreads.back().native_handle(), SIGUSR2);
 			httpClientThreads.back().detach();
 			httpClientThreads.pop_back();
 		}
@@ -392,7 +393,7 @@ int main(int argc, char **argv)
 	 * Cleanup
 	 */
 	for (auto &thread : httpClientThreads) {
-		thread.interrupt();
+		pthread_kill(thread.native_handle(), SIGUSR2);
 	}
 	for (auto &thread : httpClientThreads) {
 		thread.join();
