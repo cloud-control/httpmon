@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
@@ -33,6 +34,8 @@ typedef struct {
 	uint32_t numOptionalStuff2;
 	std::vector<double> latencies;
 	int concurrency;
+	bool open;
+	std::atomic<uint32_t> numOpenViolations;
 } HttpClientControl;
 
 double inline now()
@@ -135,6 +138,7 @@ int httpClientMain(int id, HttpClientControl &control)
 
 	rng.seed(now() + id);
 
+	double lastLatency = 0;
 	while (true) {
 		/* Check to see if paramaters have changed and update distribution */
 		if (lastThinkTime != control.thinkTime) {
@@ -147,6 +151,17 @@ int httpClientMain(int id, HttpClientControl &control)
 		 * to avoid spiky transient effects */ 
 		if (control.thinkTime > 0) {
 			double interval = waitDistribution(rng);
+
+			/* Try hard to behave open if requested */
+			if (control.open) {
+				interval -= lastLatency;
+				/* Detect violations of open model */
+				if (interval < 0) {
+					interval = 0;
+					control.numOpenViolations ++;
+				}
+			}
+
 			struct timespec timeout = { int(interval), int((interval-(int)interval) * NanoSecondsInASecond)};
 			int signo = sigtimedwait(&sigset, NULL, &timeout);
 
@@ -159,7 +174,7 @@ int httpClientMain(int id, HttpClientControl &control)
 		double start = now();
 		optionalStuff = 0;
 		bool error = (curl_easy_perform(curl) != 0);
-		double latency = now() - start;
+		lastLatency = now() - start;
 
 		/* Add data to report */
 		/* XXX: one day, this might be a bottleneck */
@@ -171,7 +186,7 @@ int httpClientMain(int id, HttpClientControl &control)
 				control.numOptionalStuff1 ++;
 			if (optionalStuff & OPTIONAL_STUFF2)
 				control.numOptionalStuff2 ++;
-			control.latencies.push_back(latency);
+			control.latencies.push_back(lastLatency);
 		}
 
 		/* If an error has occured, we might spin and lock "control" */
@@ -214,8 +229,9 @@ void report(HttpClientControl &control, double &lastReportTime, int &totalReques
 	auto latencyPercentiles = percentiles(latencies);
 	lastReportTime = reportTime;
 	totalRequests += latencies.size();
+	auto numOpenViolations = control.numOpenViolations.load();
 
-	fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms latency95=%.0fms latency99=%.0fms throughput=%.0frps rr=%.2f%% cr=%.2f%% errors=%d total=%d\n",
+	fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms latency95=%.0fms latency99=%.0fms throughput=%.0frps rr=%.2f%% cr=%.2f%% errors=%d total=%d openviolations=%d\n",
 		reportTime,
 		latencyQuartiles[0] * 1000,
 		latencyQuartiles[1] * 1000,
@@ -228,7 +244,8 @@ void report(HttpClientControl &control, double &lastReportTime, int &totalReques
 		throughput,
 		recommendationRate * 100,
 		commentRate * 100,
-		numErrors, totalRequests);
+		numErrors, totalRequests,
+		numOpenViolations);
 }
 
 void processInput(std::string &input, HttpClientControl &control)
@@ -296,6 +313,7 @@ int main(int argc, char **argv)
 	int timeout;
 	double thinkTime;
 	double interval;
+	bool open;
 
 	/*
 	 * Parse command-line
@@ -308,6 +326,7 @@ int main(int argc, char **argv)
 		("timeout", po::value<int>(&timeout)->default_value(0), "set HTTP client timeout in seconds")
 		("thinktime", po::value<double>(&thinkTime)->default_value(0), "add a random (à la Poisson) interval between requests in seconds")
 		("interval", po::value<double>(&interval)->default_value(1), "set report interval in seconds")
+		("open", "try to go for an open model, i.e., subtract the response time of the server from the think time")
 	;
 
 	po::variables_map vm;
@@ -322,6 +341,8 @@ int main(int argc, char **argv)
 	if (url.empty()) {
 		std::cerr << "Warning, empty URL given. Expect high CPU usage and many errors." << std::endl;
 	}
+
+	open = vm.count("open");
 
 	/*
 	 * Start HTTP client threads
@@ -339,6 +360,8 @@ int main(int argc, char **argv)
 	control.numOptionalStuff1 = 0;
 	control.numOptionalStuff2 = 0;
 	control.concurrency = concurrency;
+	control.open = open;
+	control.numOpenViolations = 0;
 
 	/* Start client threads */
 	std::vector<std::thread> httpClientThreads;
