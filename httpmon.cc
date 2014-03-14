@@ -295,6 +295,10 @@ void processInput(std::string &input, HttpClientControl &control)
 				control.concurrency = atoi(value.c_str());
 				fprintf(stderr, "[%f] set concurrency=%d\n", now(), control.concurrency);
 			}
+			else if (key == "open") {
+				control.open = atoi(value.c_str());
+				fprintf(stderr, "[%f] set open=%d\n", now(), control.open);
+			}
 			else
 				fprintf(stderr, "[%f] unknown key '%s'\n", now(), key.c_str());
 		}
