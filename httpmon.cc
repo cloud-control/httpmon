@@ -138,7 +138,7 @@ int httpClientMain(int id, HttpClientControl &control)
 
 	rng.seed(now() + id);
 
-	double lastLatency = 0;
+	double lastArrivalTime = now();
 	while (true) {
 		/* Check to see if paramaters have changed and update distribution */
 		if (lastThinkTime != control.thinkTime) {
@@ -152,14 +152,15 @@ int httpClientMain(int id, HttpClientControl &control)
 		if (control.thinkTime > 0) {
 			double interval = waitDistribution(rng);
 
-			/* Try hard to behave open if requested */
+			/* Behave open if requested */
+			/* NOTE: Requests may queue up on the client-side if the server is too slow */
 			if (control.open) {
-				interval -= lastLatency;
-				/* Detect violations of open model */
-				if (interval < 0) {
-					interval = 0;
-					control.numOpenViolations ++;
-				}
+				/* Adjust sleep interval, so that it does not depend on response time */
+				double nextArrivalTime = lastArrivalTime + interval;
+				interval = std::max(nextArrivalTime - now(), 0.0);
+				if (interval == 0.0)
+					control.numOpenViolations++;
+				lastArrivalTime = nextArrivalTime;
 			}
 
 			struct timespec timeout = { int(interval), int((interval-(int)interval) * NanoSecondsInASecond)};
@@ -174,7 +175,7 @@ int httpClientMain(int id, HttpClientControl &control)
 		double start = now();
 		optionalStuff = 0;
 		bool error = (curl_easy_perform(curl) != 0);
-		lastLatency = now() - start;
+		double lastLatency = now() - start;
 
 		/* Add data to report */
 		/* XXX: one day, this might be a bottleneck */
