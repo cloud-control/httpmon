@@ -1,6 +1,0 @@
-commit 8f94f6d12cbfbb4d68c3214cb2a25c275656fa7b
-Merge: 1e64872 f076df7
-Author: cklein <cklein@cs.umu.se>
-Date:   Mon Jun 17 14:57:41 2013 +0200
-
-    Merge branch 'actuator' of ssh://minitrue.cs.umu.se/home/cklein/repos/projects/cloudcontrol/actuator into actuator

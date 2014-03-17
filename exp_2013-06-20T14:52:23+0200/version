@@ -1,6 +1,0 @@
-commit e338cb0693611b8f6d94ba7ab7fa6d6554334306
-Merge: 3c9428c 54439ff
-Author: Cristian Klein <cristian.klein@cs.umu.se>
-Date:   Thu Jun 20 14:03:47 2013 +0200
-
-    Merge branch 'actuator' of ssh://minitrue.cs.umu.se/home/cklein/repos/projects/cloudcontrol/actuator into actuator

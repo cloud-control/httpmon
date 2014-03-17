@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "./rubis/PHP/localController.py", line 169, in <module>
-    main()
-  File "./rubis/PHP/localController.py", line 97, in main
-    appSocket.bind(("localhost", 2712))
-  File "/usr/lib/python2.7/socket.py", line 224, in meth
-    return getattr(self._sock,name)(*args)
-socket.error: [Errno 98] Address already in use

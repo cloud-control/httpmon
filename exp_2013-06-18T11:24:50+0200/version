@@ -1,5 +1,0 @@
-commit d528d122a4bd88c9ce69ac688ef1cfc26bbbbcf0
-Author: Cristian Klein <cristian.klein@cs.umu.se>
-Date:   Mon Jun 17 22:06:54 2013 +0200
-
-    Fix: name of VM is a parameter

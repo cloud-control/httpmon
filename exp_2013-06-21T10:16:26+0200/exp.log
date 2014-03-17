@@ -1,9 +1,0 @@
-[1371802604] start
-[1371802604] thinktime=3
-[1371802604] thinktime=0.1
-[1371802604] concurrency=10
-[1371802604] concurrency=1
-[1371802804] concurrency=50
-[1371803004] concurrency=50
-[1371803004] concurrency=50
-[1371803204] concurrency=1

@@ -1,7 +1,0 @@
-Currently running VMs
-2013-06-17 13:17:11.673+0000: 15457: info : libvirt version: 0.9.8
-2013-06-17 13:17:11.673+0000: 15457: warning : xenHypervisorMakeCapabilities:2751 : Failed to get host power management capabilities
-- Domain-0 weight=256 cap=0 vcpus=32
-- rubbos-hvm weight=256 cap=0 vcpus=4 mac=aa:00:00:00:00:11
-- rubis-hvm weight=256 cap=400 vcpus=4 mac=aa:00:00:00:00:10
-New scheduling parameters:  weight=256 cap=400 vcpus=4

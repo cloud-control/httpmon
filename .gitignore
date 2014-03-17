@@ -1,6 +1,6 @@
 *.o
 actuator
 core
-rm
+resman
 httpmon
 
