@@ -8,6 +8,7 @@
 #include <chrono>
 #include <curl/curl.h>
 #include <fcntl.h>
+#include <limits>
 #include <mutex>
 #include <poll.h>
 #include <random>
@@ -36,6 +37,7 @@ typedef struct {
 	int concurrency;
 	bool open;
 	std::atomic<uint32_t> numOpenViolations;
+	std::atomic<int> numRequestsLeft;
 } HttpClientControl;
 
 double inline now()
@@ -139,7 +141,7 @@ int httpClientMain(int id, HttpClientControl &control)
 	rng.seed(now() + id);
 
 	double lastArrivalTime = now();
-	while (true) {
+	while (--control.numRequestsLeft >= 0) {
 		/* Check to see if paramaters have changed and update distribution */
 		if (lastThinkTime != control.thinkTime) {
 			lastThinkTime = control.thinkTime;
@@ -319,6 +321,7 @@ int main(int argc, char **argv)
 	double thinkTime;
 	double interval;
 	bool open;
+	int numRequestsLeft;
 
 	/*
 	 * Parse command-line
@@ -332,6 +335,7 @@ int main(int argc, char **argv)
 		("thinktime", po::value<double>(&thinkTime)->default_value(0), "add a random (à la Poisson) interval between requests in seconds")
 		("interval", po::value<double>(&interval)->default_value(1), "set report interval in seconds")
 		("open", "use the open model with client-side queuing, i.e., arrival times do not depend on the response time of the server")
+		("count", po::value<int>(&numRequestsLeft)->default_value(std::numeric_limits<int>::max()), "stop after sending this many requests (default: do not stop)")
 	;
 
 	po::variables_map vm;
@@ -367,6 +371,7 @@ int main(int argc, char **argv)
 	control.concurrency = concurrency;
 	control.open = open;
 	control.numOpenViolations = 0;
+	control.numRequestsLeft = numRequestsLeft;
 
 	/* Start client threads */
 	std::vector<std::thread> httpClientThreads;
@@ -395,7 +400,7 @@ int main(int argc, char **argv)
 	double lastReportTime = now();
 	int totalRequests = 0;
 	std::string prevInput;
-	while (control.running) {
+	while (control.running && control.numRequestsLeft > 0) {
 		struct timespec timeout = { int(interval), int((interval-(int)interval) * NanoSecondsInASecond)};
 		signo = sigtimedwait(&sigset, NULL, &timeout);
 
@@ -415,13 +420,17 @@ int main(int argc, char **argv)
 			httpClientThreads.pop_back();
 		}
 	}
-	fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
+	if (signo > 0)
+		fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
+	/* Otherwise, we made enough requests */
 
 	/*
 	 * Cleanup
 	 */
-	for (auto &thread : httpClientThreads) {
-		pthread_kill(thread.native_handle(), SIGUSR2);
+	if (control.numRequestsLeft > 0) {
+		for (auto &thread : httpClientThreads) {
+			pthread_kill(thread.native_handle(), SIGUSR2);
+		}
 	}
 	for (auto &thread : httpClientThreads) {
 		thread.join();
