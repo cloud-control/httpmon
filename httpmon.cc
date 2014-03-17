@@ -331,7 +331,7 @@ int main(int argc, char **argv)
 		("timeout", po::value<int>(&timeout)->default_value(0), "set HTTP client timeout in seconds")
 		("thinktime", po::value<double>(&thinkTime)->default_value(0), "add a random (à la Poisson) interval between requests in seconds")
 		("interval", po::value<double>(&interval)->default_value(1), "set report interval in seconds")
-		("open", "try to go for an open model, i.e., subtract the response time of the server from the think time")
+		("open", "use the open model with client-side queuing, i.e., arrival times do not depend on the response time of the server")
 	;
 
 	po::variables_map vm;
