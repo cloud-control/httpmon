@@ -16,8 +16,9 @@
 #include <thread>
 #include <vector>
 
-#define OPTIONAL_STUFF1 0x01
-#define OPTIONAL_STUFF2 0x02
+#define RESPONSEFLAGS_CONTENT 0x01
+#define RESPONSEFLAGS_OPTION1 0x02
+#define RESPONSEFLAGS_OPTION2 0x04
 
 const int OptionalStuffMarker1 = 128;
 const int OptionalStuffMarker2 = 129;
@@ -126,12 +127,14 @@ Statistics<typename T::value_type> computeStatistics(T &a)
 
 size_t nullWriter(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
-	uint32_t *optionalStuff = (uint32_t *)userdata;
+	uint32_t *responseFlags = (uint32_t *)userdata;
 
+	if (size * nmemb > 0)
+		*responseFlags |= RESPONSEFLAGS_CONTENT;
 	if (memchr(ptr, OptionalStuffMarker1, size*nmemb) != NULL)
-		*optionalStuff |= OPTIONAL_STUFF1;
+		*responseFlags |= RESPONSEFLAGS_OPTION1;
 	if (memchr(ptr, OptionalStuffMarker2, size*nmemb) != NULL)
-		*optionalStuff |= OPTIONAL_STUFF2;
+		*responseFlags |= RESPONSEFLAGS_OPTION2;
 	return size * nmemb; /* i.e., pretend we are actually doing something */
 }
 
@@ -143,16 +146,16 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 	sigaddset(&sigset, SIGUSR2);
 	pthread_sigmask(SIG_BLOCK, &sigset, NULL);
 
-	uint32_t optionalStuff;
+	uint32_t responseFlags;
 
 	CURL *curl = curl_easy_init();
 	curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
 	curl_easy_setopt(curl, CURLOPT_URL, control.url.c_str());
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, nullWriter);
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, nullWriter);
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, control.timeout);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &optionalStuff);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseFlags);
+	curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 60L);
 
 	std::default_random_engine rng; /* random number generator */
 	double lastThinkTime = control.thinkTime;
@@ -173,7 +176,7 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 		
 		/* Simulate think-time */
 		/* We make sure that we first wait, then initiate the first connection
-		 * to avoid spiky transient effects */ 
+		 * to avoid spiky transient effects */
 		if (thinkTime > 0) {
 			double interval = waitDistribution(rng);
 
@@ -203,7 +206,7 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 		if (control.numRequestsLeft-- > 0) {
 			/* Send HTTP request */
 			double start = now();
-			optionalStuff = 0;
+			responseFlags = 0;
 			bool error = (curl_easy_perform(curl) != 0);
 			double lastLatency = now() - start;
 
@@ -213,13 +216,13 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 				std::lock_guard<std::mutex> lock(data.mutex);
 
 				data.latencies.push_back(lastLatency);
-				if (optionalStuff & OPTIONAL_STUFF1)
+				if (responseFlags & RESPONSEFLAGS_OPTION1)
 					data.numOption1 ++;
-				if (optionalStuff & OPTIONAL_STUFF2)
+				if (responseFlags & RESPONSEFLAGS_OPTION2)
 					data.numOption2 ++;
 				if (didOpenQueuing)
 					data.numOpenQueuing++;
-				if (error)
+				if (error || ((responseFlags & RESPONSEFLAGS_CONTENT) == 0))
 					data.numErrors++;
 			}
 		}
