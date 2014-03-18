@@ -36,7 +36,7 @@ typedef struct {
 	std::vector<double> latencies;
 	int concurrency;
 	bool open;
-	std::atomic<uint32_t> numOpenViolations;
+	std::atomic<uint32_t> numOpenQueuing;
 	std::atomic<int> numRequestsLeft;
 } HttpClientControl;
 
@@ -161,7 +161,7 @@ int httpClientMain(int id, HttpClientControl &control)
 				double nextArrivalTime = lastArrivalTime + interval;
 				interval = std::max(nextArrivalTime - now(), 0.0);
 				if (interval == 0.0)
-					control.numOpenViolations++;
+					control.numOpenQueuing++;
 				lastArrivalTime = nextArrivalTime;
 			}
 
@@ -232,9 +232,9 @@ void report(HttpClientControl &control, double &lastReportTime, int &totalReques
 	auto latencyPercentiles = percentiles(latencies);
 	lastReportTime = reportTime;
 	totalRequests += latencies.size();
-	auto numOpenViolations = control.numOpenViolations.load();
+	auto numOpenQueuing = control.numOpenQueuing.load();
 
-	fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms latency95=%.0fms latency99=%.0fms throughput=%.0frps rr=%.2f%% cr=%.2f%% errors=%d total=%d openviolations=%d\n",
+	fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms latency95=%.0fms latency99=%.0fms throughput=%.0frps rr=%.2f%% cr=%.2f%% errors=%d total=%d openqueuing=%d\n",
 		reportTime,
 		latencyQuartiles[0] * 1000,
 		latencyQuartiles[1] * 1000,
@@ -248,7 +248,7 @@ void report(HttpClientControl &control, double &lastReportTime, int &totalReques
 		recommendationRate * 100,
 		commentRate * 100,
 		numErrors, totalRequests,
-		numOpenViolations);
+		numOpenQueuing);
 }
 
 void processInput(std::string &input, HttpClientControl &control)
@@ -370,7 +370,7 @@ int main(int argc, char **argv)
 	control.numOptionalStuff2 = 0;
 	control.concurrency = concurrency;
 	control.open = open;
-	control.numOpenViolations = 0;
+	control.numOpenQueuing = 0;
 	control.numRequestsLeft = numRequestsLeft;
 
 	/* Start client threads */
