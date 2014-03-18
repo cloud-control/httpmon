@@ -304,6 +304,11 @@ void processInput(std::string &input, HttpClientControl &control)
 				control.open = atoi(value.c_str());
 				fprintf(stderr, "[%f] set open=%d\n", now(), control.open);
 			}
+			else if (key == "count") {
+				int numRequestsLeft = atoi(value.c_str()); /* avoid race */
+				control.numRequestsLeft = numRequestsLeft;
+				fprintf(stderr, "[%f] set count=%d\n", now(), numRequestsLeft);
+			}
 			else
 				fprintf(stderr, "[%f] unknown key '%s'\n", now(), key.c_str());
 		}
