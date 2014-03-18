@@ -141,7 +141,7 @@ int httpClientMain(int id, HttpClientControl &control)
 	rng.seed(now() + id);
 
 	double lastArrivalTime = now();
-	while (--control.numRequestsLeft >= 0) {
+	while (true) {
 		/* Check to see if paramaters have changed and update distribution */
 		if (lastThinkTime != control.thinkTime) {
 			lastThinkTime = control.thinkTime;
@@ -171,30 +171,32 @@ int httpClientMain(int id, HttpClientControl &control)
 			if (signo > 0)
 				break; /* master thread asked us to exit */
 		}
-
-
-		/* Send HTTP request */
-		double start = now();
-		optionalStuff = 0;
-		bool error = (curl_easy_perform(curl) != 0);
-		double lastLatency = now() - start;
-
-		/* Add data to report */
-		/* XXX: one day, this might be a bottleneck */
-		{
-			std::lock_guard<std::mutex> lock(control.mutex);
-			if (error)
-				control.numErrors ++;
-			if (optionalStuff & OPTIONAL_STUFF1)
-				control.numOptionalStuff1 ++;
-			if (optionalStuff & OPTIONAL_STUFF2)
-				control.numOptionalStuff2 ++;
-			control.latencies.push_back(lastLatency);
+		else {
+			/* Avoid spinning */
+			usleep(0);
 		}
 
-		/* If an error has occured, we might spin and lock "control" */
-		if (error)
-			usleep(0);
+		/* Check if we are allowed to send this request */
+		if (control.numRequestsLeft-- > 0) {
+			/* Send HTTP request */
+			double start = now();
+			optionalStuff = 0;
+			bool error = (curl_easy_perform(curl) != 0);
+			double lastLatency = now() - start;
+
+			/* Add data to report */
+			/* XXX: one day, this might be a bottleneck */
+			{
+				std::lock_guard<std::mutex> lock(control.mutex);
+				if (error)
+					control.numErrors ++;
+				if (optionalStuff & OPTIONAL_STUFF1)
+					control.numOptionalStuff1 ++;
+				if (optionalStuff & OPTIONAL_STUFF2)
+					control.numOptionalStuff2 ++;
+				control.latencies.push_back(lastLatency);
+			}
+		}
 	}
 
 	curl_easy_cleanup(curl);
@@ -400,7 +402,7 @@ int main(int argc, char **argv)
 	double lastReportTime = now();
 	int totalRequests = 0;
 	std::string prevInput;
-	while (control.running && control.numRequestsLeft > 0) {
+	while (control.running) {
 		struct timespec timeout = { int(interval), int((interval-(int)interval) * NanoSecondsInASecond)};
 		signo = sigtimedwait(&sigset, NULL, &timeout);
 
@@ -420,17 +422,13 @@ int main(int argc, char **argv)
 			httpClientThreads.pop_back();
 		}
 	}
-	if (signo > 0)
-		fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
-	/* Otherwise, we made enough requests */
+	fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
 
 	/*
 	 * Cleanup
 	 */
-	if (control.numRequestsLeft > 0) {
-		for (auto &thread : httpClientThreads) {
-			pthread_kill(thread.native_handle(), SIGUSR2);
-		}
+	for (auto &thread : httpClientThreads) {
+		pthread_kill(thread.native_handle(), SIGUSR2);
 	}
 	for (auto &thread : httpClientThreads) {
 		thread.join();
