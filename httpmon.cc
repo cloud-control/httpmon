@@ -40,6 +40,13 @@ typedef struct {
 	std::atomic<int> numRequestsLeft;
 } HttpClientControl;
 
+template<typename T>
+struct Statistics {
+	T minimum, lowerQuartile, median, upperQuartile, maximum;
+	T percentile95, percentile99;
+	T average;
+};
+
 double inline now()
 {
 	struct timeval tv;
@@ -59,42 +66,10 @@ typename T::value_type median(T begin, T end)
 		return (*(begin+(n-1)/2) + *(begin+(n-1)/2+1))/2;
 }
 
-template<typename T>
-std::array<typename T::value_type, 5> quartiles(T &a)
+size_t percentileRank(size_t n, double percentile)
 {
-	/* return value: minimum, first quartile, median, third quartile, maximum */
-	std::array<typename T::value_type, 5> ret = {{ NAN, NAN, NAN, NAN, NAN }};
-
-	size_t n = a.size();
-	if (n < 1)
-		return ret;
-	std::sort(a.begin(), a.end());
-
-	ret[0] = a[0]  ; /* minimum */
-	ret[4] = a[n-1]; /* maximum */
-
-	ret[2] = median(a.begin(), a.end());
-	ret[1] = median(a.begin(), a.begin() + n / 2);
-	ret[3] = median(a.begin() + n / 2, a.end());
-
-	return ret;
-}
-
-template<typename T>
-std::array<typename T::value_type, 2> percentiles(T &a)
-{
-	/* return value: 95 percentile, 99 percentile */
-	std::array<typename T::value_type, 2> ret = {{ NAN, NAN }};
-
-	size_t n = a.size();
-	if (n < 1)
-		return ret;
-	std::sort(a.begin(), a.end());
-
-	ret[0] = median(a.begin() + 90 * n / 100, a.end());
-	ret[1] = median(a.begin() + 98 * n / 100, a.end());
-
-	return ret;
+	/* Nearest rank: http://en.wikipedia.org/wiki/Percentile#Nearest_rank */
+	return static_cast<size_t>(percentile / 100.0 * n - 0.5);
 }
 
 template<typename T>
@@ -102,6 +77,32 @@ double average(const T &a)
 {
 	double sum = std::accumulate(a.begin(), a.end(), 0.0);
 	return sum / a.size();
+}
+
+template<typename T>
+Statistics<typename T::value_type> computeStatistics(T &a)
+{
+	Statistics<typename T::value_type> s =
+		{ NAN, NAN, NAN, NAN, NAN, NAN };
+
+	size_t n = a.size();
+	if (n < 1)
+		return s;
+	std::sort(a.begin(), a.end());
+
+	s.minimum = a[0]  ; /* minimum */
+	s.maximum = a[n-1]; /* maximum */
+
+	s.median = median(a.begin(), a.end());
+	s.lowerQuartile = median(a.begin(), a.begin() + n / 2);
+	s.upperQuartile = median(a.begin() + n / 2, a.end());
+
+	s.percentile95 = a[percentileRank(n, 95)];
+	s.percentile99 = a[percentileRank(n, 99)];
+
+	s.average = average(a);
+
+	return s;
 }
 
 size_t nullWriter(char *ptr, size_t size, size_t nmemb, void *userdata)
@@ -230,22 +231,21 @@ void report(HttpClientControl &control, double &lastReportTime, int &totalReques
 	double throughput = (double)latencies.size() / (reportTime - lastReportTime);
 	double recommendationRate = (double)numOptionalStuff1 / latencies.size();
 	double commentRate = (double)numOptionalStuff2 / latencies.size();
-	auto latencyQuartiles = quartiles(latencies);
-	auto latencyPercentiles = percentiles(latencies);
+	auto stats = computeStatistics(latencies);
 	lastReportTime = reportTime;
 	totalRequests += latencies.size();
 	auto numOpenQueuing = control.numOpenQueuing.load();
 
 	fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms latency95=%.0fms latency99=%.0fms throughput=%.0frps rr=%.2f%% cr=%.2f%% errors=%d total=%d openqueuing=%d\n",
 		reportTime,
-		latencyQuartiles[0] * 1000,
-		latencyQuartiles[1] * 1000,
-		latencyQuartiles[2] * 1000,
-		latencyQuartiles[3] * 1000,
-		latencyQuartiles[4] * 1000,
-		average(latencies) * 1000,
-		latencyPercentiles[0] * 1000,
-		latencyPercentiles[1] * 1000,
+		stats.minimum * 1000,
+		stats.lowerQuartile * 1000,
+		stats.median * 1000,
+		stats.upperQuartile * 1000,
+		stats.maximum * 1000,
+		stats.average * 1000,
+		stats.percentile95 * 1000,
+		stats.percentile99 * 1000,
 		throughput,
 		recommendationRate * 100,
 		commentRate * 100,
