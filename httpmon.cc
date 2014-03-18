@@ -24,27 +24,39 @@ const int OptionalStuffMarker2 = 129;
 const long MicroSecondsInASecond = 1000000;
 const long NanoSecondsInASecond = 1000000000;
 
-typedef struct {
-	std::string url;
-	int timeout;
-	double thinkTime;
+struct ClientControl {
+	/* Control */
 	volatile bool running;
-	std::mutex mutex;
-	uint32_t numErrors;
-	uint32_t numOptionalStuff1;
-	uint32_t numOptionalStuff2;
-	std::vector<double> latencies;
-	int concurrency;
-	bool open;
-	std::atomic<uint32_t> numOpenQueuing;
 	std::atomic<int> numRequestsLeft;
+
+	/* Client parameters */
+	std::string url;
+	int concurrency;
+	double thinkTime;
+	int timeout;
+	bool open;
+};
+
+struct ClientData {
+	/* Protect this structure from concurrent access */
+	std::mutex mutex;
+
+	/* Data collected by clients */
+	std::vector<double> latencies;
+	uint32_t numOption1;
+	uint32_t numOption2;
+	uint32_t numOpenQueuing;
+	uint32_t numErrors;
 } HttpClientControl;
 
-template<typename T>
-struct Statistics {
-	T minimum, lowerQuartile, median, upperQuartile, maximum;
-	T percentile95, percentile99;
-	T average;
+struct AccumulatedData {
+	double reportTime;
+
+	std::vector<double> latencies;
+	uint32_t numOption1;
+	uint32_t numOption2;
+	uint32_t numOpenQueuing;
+	uint32_t numErrors;
 };
 
 double inline now()
@@ -53,6 +65,13 @@ double inline now()
 	gettimeofday(&tv, NULL);
 	return (double)tv.tv_usec / 1000000 + tv.tv_sec;
 }
+
+template<typename T>
+struct Statistics {
+	T minimum, lowerQuartile, median, upperQuartile, maximum;
+	T percentile95, percentile99;
+	T average;
+};
 
 template<typename T>
 typename T::value_type median(T begin, T end)
@@ -116,7 +135,7 @@ size_t nullWriter(char *ptr, size_t size, size_t nmemb, void *userdata)
 	return size * nmemb; /* i.e., pretend we are actually doing something */
 }
 
-int httpClientMain(int id, HttpClientControl &control)
+int httpClientMain(int id, ClientControl &control, ClientData &data)
 {
 	/* Block SIGUSR2 */
 	sigset_t sigset;
@@ -137,22 +156,25 @@ int httpClientMain(int id, HttpClientControl &control)
 
 	std::default_random_engine rng; /* random number generator */
 	double lastThinkTime = control.thinkTime;
-	std::exponential_distribution<double> waitDistribution(1 / control.thinkTime);
+	std::exponential_distribution<double> waitDistribution(1.0 / lastThinkTime);
 
 	rng.seed(now() + id);
 
 	double lastArrivalTime = now();
 	while (true) {
+		bool didOpenQueuing = false;
+
 		/* Check to see if paramaters have changed and update distribution */
-		if (lastThinkTime != control.thinkTime) {
-			lastThinkTime = control.thinkTime;
-			waitDistribution = std::exponential_distribution<double>(1 / control.thinkTime);
+		const double thinkTime = control.thinkTime; /* for atomicity */
+		if (lastThinkTime != thinkTime) {
+			waitDistribution = std::exponential_distribution<double>(1.0 / thinkTime);
+			lastThinkTime = thinkTime;
 		}
 		
 		/* Simulate think-time */
 		/* We make sure that we first wait, then initiate the first connection
 		 * to avoid spiky transient effects */ 
-		if (control.thinkTime > 0) {
+		if (thinkTime > 0) {
 			double interval = waitDistribution(rng);
 
 			/* Behave open if requested */
@@ -162,7 +184,7 @@ int httpClientMain(int id, HttpClientControl &control)
 				double nextArrivalTime = lastArrivalTime + interval;
 				interval = std::max(nextArrivalTime - now(), 0.0);
 				if (interval == 0.0)
-					control.numOpenQueuing++;
+					didOpenQueuing++;
 				lastArrivalTime = nextArrivalTime;
 			}
 
@@ -188,14 +210,17 @@ int httpClientMain(int id, HttpClientControl &control)
 			/* Add data to report */
 			/* XXX: one day, this might be a bottleneck */
 			{
-				std::lock_guard<std::mutex> lock(control.mutex);
-				if (error)
-					control.numErrors ++;
+				std::lock_guard<std::mutex> lock(data.mutex);
+
+				data.latencies.push_back(lastLatency);
 				if (optionalStuff & OPTIONAL_STUFF1)
-					control.numOptionalStuff1 ++;
+					data.numOption1 ++;
 				if (optionalStuff & OPTIONAL_STUFF2)
-					control.numOptionalStuff2 ++;
-				control.latencies.push_back(lastLatency);
+					data.numOption2 ++;
+				if (didOpenQueuing)
+					data.numOpenQueuing++;
+				if (error)
+					data.numErrors++;
 			}
 		}
 	}
@@ -205,38 +230,45 @@ int httpClientMain(int id, HttpClientControl &control)
 	return 0;
 }
 
-void report(HttpClientControl &control, double &lastReportTime, int &totalRequests)
+void report(ClientData &_data, AccumulatedData &accData)
 {
 	/* Atomically retrieve relevant data */
-	int numErrors;
-	int numOptionalStuff1;
-	int numOptionalStuff2;
-	std::vector<double> latencies;
-	double reportTime;
+	ClientData data;
 	{
-		std::lock_guard<std::mutex> lock(control.mutex);
+		std::lock_guard<std::mutex> lock(_data.mutex);
+		data.latencies = std::move(_data.latencies);
+		data.numOption1 = _data.numOption1;
+		data.numOption2 = _data.numOption2;
+		data.numOpenQueuing = _data.numOpenQueuing;
+		data.numErrors = _data.numErrors;
 
-		numErrors = control.numErrors;
-		numOptionalStuff1 = control.numOptionalStuff1;
-		numOptionalStuff2 = control.numOptionalStuff2;
-		latencies = control.latencies;
-
-		control.numErrors = 0;
-		control.numOptionalStuff1 = 0;
-		control.numOptionalStuff2 = 0;
-		control.latencies.clear();
-		reportTime = now();
+		_data.latencies.clear();
+		_data.numOption1 = 0;
+		_data.numOption2 = 0;
+		_data.numOpenQueuing = 0;
+		_data.numErrors = 0;
 	}
+	
+	/* Compute how much time passed */
+	double reportTime = now(); /* for atomicity */
+	double dt = reportTime - accData.reportTime;
+	accData.reportTime = reportTime;
 
-	double throughput = (double)latencies.size() / (reportTime - lastReportTime);
-	double recommendationRate = (double)numOptionalStuff1 / latencies.size();
-	double commentRate = (double)numOptionalStuff2 / latencies.size();
-	auto stats = computeStatistics(latencies);
-	lastReportTime = reportTime;
-	totalRequests += latencies.size();
-	auto numOpenQueuing = control.numOpenQueuing.load();
+	/* Compute statistics since last reporting */
+	double throughput = (double)data.latencies.size() / dt;
+	double recommendationRate = (double)data.numOption1 / data.latencies.size();
+	double commentRate = (double)data.numOption2 / data.latencies.size();
+	auto stats = computeStatistics(data.latencies);
 
-	fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms latency95=%.0fms latency99=%.0fms throughput=%.0frps rr=%.2f%% cr=%.2f%% errors=%d total=%d openqueuing=%d\n",
+	/* Compute accumulated statistics */
+	accData.numOption1 += data.numOption1;
+	accData.numOption2 += data.numOption2;
+	accData.numOpenQueuing += data.numOpenQueuing;
+	accData.numErrors += data.numErrors;
+	accData.latencies.insert(accData.latencies.end(), data.latencies.begin(), data.latencies.end());
+	auto accStats = computeStatistics(accData.latencies);
+
+	fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms latency95=%.0fms latency99=%.0fms throughput=%.0frps rr=%.2f%% cr=%.2f%% accRequests=%d accOption1=%d accOption2=%d accLatency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms accLatency95=%.0fms accLatency99=%.0fms accOpenQueuing=%d accErrors=%d\n",
 		reportTime,
 		stats.minimum * 1000,
 		stats.lowerQuartile * 1000,
@@ -249,11 +281,24 @@ void report(HttpClientControl &control, double &lastReportTime, int &totalReques
 		throughput,
 		recommendationRate * 100,
 		commentRate * 100,
-		numErrors, totalRequests,
-		numOpenQueuing);
+		/* Accumulated statistics */
+		(int)accData.latencies.size(),
+		accData.numOption1,
+		accData.numOption2,
+		accStats.minimum * 1000,
+		accStats.lowerQuartile * 1000,
+		accStats.median * 1000,
+		accStats.upperQuartile * 1000,
+		accStats.maximum * 1000,
+		accStats.average * 1000,
+		accStats.percentile95 * 1000,
+		accStats.percentile99 * 1000,
+		accData.numOpenQueuing,
+		accData.numErrors
+	);
 }
 
-void processInput(std::string &input, HttpClientControl &control)
+void processInput(std::string &input, ClientControl &control)
 {
 	/* Store last size */
 	size_t prevInputSize = input.size();
@@ -366,24 +411,35 @@ int main(int argc, char **argv)
 
 	curl_global_init(CURL_GLOBAL_ALL);
 
-	/* Setup thread control structure */
-	HttpClientControl control;
+	/* Setup thread control */
+	ClientControl control;
 	control.running = true;
-	control.url = url;
-	control.timeout = timeout;
-	control.thinkTime = thinkTime;
-	control.numErrors = 0;
-	control.numOptionalStuff1 = 0;
-	control.numOptionalStuff2 = 0;
-	control.concurrency = concurrency;
-	control.open = open;
-	control.numOpenQueuing = 0;
 	control.numRequestsLeft = numRequestsLeft;
+	control.url = url;
+	control.concurrency = concurrency;
+	control.thinkTime = thinkTime;
+	control.timeout = timeout;
+	control.open = open;
+
+	/* Setup thread data */
+	ClientData data;
+	data.numOption1 = 0;
+	data.numOption2 = 0;
+	data.numOpenQueuing = 0;
+	data.numErrors = 0;
+	
+	/* Setup accumulated data */
+	AccumulatedData accData;
+	accData.numOption1 = 0;
+	accData.numOption2 = 0;
+	accData.numOpenQueuing = 0;
+	accData.numErrors = 0;
 
 	/* Start client threads */
 	std::vector<std::thread> httpClientThreads;
 	for (int i = 0; i < concurrency; i++) {
-		httpClientThreads.emplace_back(httpClientMain, i, std::ref(control));
+		httpClientThreads.emplace_back(httpClientMain, i,
+			std::ref(control), std::ref(data));
 	}
 
 	/*
@@ -404,8 +460,7 @@ int main(int argc, char **argv)
 
 	/* Report at regular intervals */
 	int signo;
-	double lastReportTime = now();
-	int totalRequests = 0;
+	accData.reportTime = now();
 	std::string prevInput;
 	while (control.running) {
 		struct timespec timeout = { int(interval), int((interval-(int)interval) * NanoSecondsInASecond)};
@@ -414,12 +469,13 @@ int main(int argc, char **argv)
 		if (signo > 0)
 			control.running = false;
 
-		report(control, lastReportTime, totalRequests);
+		report(data, accData);
 		processInput(prevInput, control);
 
 		/* Check if requested concurrency increased */
 		while ((int)httpClientThreads.size() < control.concurrency)
-			httpClientThreads.emplace_back(httpClientMain, httpClientThreads.size(), std::ref(control));
+			httpClientThreads.emplace_back(httpClientMain,
+				httpClientThreads.size(), std::ref(control), std::ref(data));
 		/* Check if requested concurrency decreased */
 		while ((int)httpClientThreads.size() > control.concurrency) {
 			pthread_kill(httpClientThreads.back().native_handle(), SIGUSR2);
@@ -441,7 +497,7 @@ int main(int argc, char **argv)
 	curl_global_cleanup();
 
 	/* Final stats */
-	report(control, lastReportTime, totalRequests);
+	report(data, accData);
 
 	return 0;
 }
