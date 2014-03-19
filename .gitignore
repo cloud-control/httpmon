@@ -1,6 +1,4 @@
 *.o
-actuator
 core
-resman
 httpmon
 
