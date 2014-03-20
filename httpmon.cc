@@ -153,7 +153,8 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 	curl_easy_setopt(curl, CURLOPT_URL, control.url.c_str());
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, nullWriter);
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
-	curl_easy_setopt(curl, CURLOPT_TIMEOUT, control.timeout);
+	double lastTimeout = control.timeout;
+	curl_easy_setopt(curl, CURLOPT_TIMEOUT, lastTimeout);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseFlags);
 	curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 60L);
 
@@ -173,7 +174,7 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			waitDistribution = std::exponential_distribution<double>(1.0 / thinkTime);
 			lastThinkTime = thinkTime;
 		}
-		
+
 		/* Simulate think-time */
 		/* We make sure that we first wait, then initiate the first connection
 		 * to avoid spiky transient effects */
@@ -204,6 +205,13 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 
 		/* Check if we are allowed to send this request */
 		if (control.numRequestsLeft-- > 0) {
+			/* Check if timeout has changed */
+			double timeout = control.timeout; /* for atomicity */
+			if (timeout != lastTimeout) {
+				lastTimeout = timeout;
+				curl_easy_setopt(curl, CURLOPT_TIMEOUT, lastTimeout);
+			}
+
 			/* Send HTTP request */
 			double start = now();
 			responseFlags = 0;
@@ -356,6 +364,10 @@ void processInput(std::string &input, ClientControl &control)
 				int numRequestsLeft = atoi(value.c_str()); /* avoid race */
 				control.numRequestsLeft = numRequestsLeft;
 				fprintf(stderr, "[%f] set count=%d\n", now(), numRequestsLeft);
+			}
+			else if (key == "timeout") {
+				control.timeout = atoi(value.c_str());
+				fprintf(stderr, "[%f] set timeout=%d\n", now(), control.timeout);
 			}
 			else
 				fprintf(stderr, "[%f] unknown key '%s'\n", now(), key.c_str());
