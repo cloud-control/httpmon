@@ -155,6 +155,7 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 	double lastTimeout = control.timeout;
 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, lastTimeout);
+	curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, lastTimeout);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseFlags);
 	curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 60L);
 
@@ -210,6 +211,7 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			if (timeout != lastTimeout) {
 				lastTimeout = timeout;
 				curl_easy_setopt(curl, CURLOPT_TIMEOUT, lastTimeout);
+				curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, lastTimeout);
 			}
 
 			/* Send HTTP request */
