@@ -34,7 +34,7 @@ struct ClientControl {
 	std::string url;
 	int concurrency;
 	double thinkTime;
-	int timeout;
+	long timeout;
 	bool open;
 };
 
@@ -153,7 +153,7 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 	curl_easy_setopt(curl, CURLOPT_URL, control.url.c_str());
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, nullWriter);
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
-	double lastTimeout = control.timeout;
+	long lastTimeout = control.timeout;
 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, lastTimeout);
 	curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, lastTimeout);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseFlags);
@@ -207,7 +207,7 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 		/* Check if we are allowed to send this request */
 		if (control.numRequestsLeft-- > 0) {
 			/* Check if timeout has changed */
-			double timeout = control.timeout; /* for atomicity */
+			long timeout = control.timeout; /* for atomicity */
 			if (timeout != lastTimeout) {
 				lastTimeout = timeout;
 				curl_easy_setopt(curl, CURLOPT_TIMEOUT, lastTimeout);
@@ -368,8 +368,8 @@ void processInput(std::string &input, ClientControl &control)
 				fprintf(stderr, "[%f] set count=%d\n", now(), numRequestsLeft);
 			}
 			else if (key == "timeout") {
-				control.timeout = atoi(value.c_str());
-				fprintf(stderr, "[%f] set timeout=%d\n", now(), control.timeout);
+				control.timeout = atol(value.c_str());
+				fprintf(stderr, "[%f] set timeout=%ld\n", now(), control.timeout);
 			}
 			else
 				fprintf(stderr, "[%f] unknown key '%s'\n", now(), key.c_str());
@@ -386,7 +386,7 @@ int main(int argc, char **argv)
 	 */
 	std::string url;
 	int concurrency;
-	int timeout;
+	long timeout;
 	double thinkTime;
 	double interval;
 	bool open;
@@ -400,7 +400,7 @@ int main(int argc, char **argv)
 		("help", "produce help message")
 		("url", po::value<std::string>(&url), "set URL to request")
 		("concurrency", po::value<int>(&concurrency)->default_value(100), "set concurrency (number of HTTP client threads)")
-		("timeout", po::value<int>(&timeout)->default_value(0), "set HTTP client timeout in seconds")
+		("timeout", po::value<long>(&timeout)->default_value(0), "set HTTP client timeout in seconds")
 		("thinktime", po::value<double>(&thinkTime)->default_value(0), "add a random (à la Poisson) interval between requests in seconds")
 		("interval", po::value<double>(&interval)->default_value(1), "set report interval in seconds")
 		("open", "use the open model with client-side queuing, i.e., arrival times do not depend on the response time of the server")
