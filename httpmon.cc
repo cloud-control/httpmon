@@ -179,8 +179,9 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 		/* Simulate think-time */
 		/* We make sure that we first wait, then initiate the first connection
 		 * to avoid spiky transient effects */
+		double interval = 0.0;
 		if (thinkTime > 0) {
-			double interval = waitDistribution(rng);
+			interval = waitDistribution(rng);
 
 			/* Behave open if requested */
 			/* NOTE: Requests may queue up on the client-side if the server is too slow */
@@ -192,17 +193,15 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 					didOpenQueuing++;
 				lastArrivalTime = nextArrivalTime;
 			}
-
-			struct timespec timeout = { int(interval), int((interval-(int)interval) * NanoSecondsInASecond)};
-			int signo = sigtimedwait(&sigset, NULL, &timeout);
-
-			if (signo > 0)
-				break; /* master thread asked us to exit */
 		}
-		else {
-			/* Avoid spinning */
-			usleep(0);
-		}
+		/* In worst case, interval == 0, to yield and avoid spinning */
+
+		/* Sleep (or yield) for a while */
+		struct timespec timeout = { int(interval), int((interval-(int)interval) * NanoSecondsInASecond)};
+		int signo = sigtimedwait(&sigset, NULL, &timeout);
+
+		if (signo > 0)
+			break; /* master thread asked us to exit */
 
 		/* Check if we are allowed to send this request */
 		if (control.numRequestsLeft-- > 0) {
