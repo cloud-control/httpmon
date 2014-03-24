@@ -34,7 +34,7 @@ struct ClientControl {
 	std::string url;
 	int concurrency;
 	double thinkTime;
-	long timeout;
+	double timeout;
 	bool open;
 };
 
@@ -153,9 +153,6 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 	curl_easy_setopt(curl, CURLOPT_URL, control.url.c_str());
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, nullWriter);
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
-	long lastTimeout = control.timeout;
-	curl_easy_setopt(curl, CURLOPT_TIMEOUT, lastTimeout);
-	curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, lastTimeout);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseFlags);
 	curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 60L);
 
@@ -205,16 +202,18 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 
 		/* Check if we are allowed to send this request */
 		if (control.numRequestsLeft-- > 0) {
-			/* Check if timeout has changed */
-			long timeout = control.timeout; /* for atomicity */
-			if (control.open) {
-				timeout = std::max(0L, static_cast<long>((lastArrivalTime + timeout) - now()));
-			}
-			if (timeout != lastTimeout) {
-				lastTimeout = timeout;
-				curl_easy_setopt(curl, CURLOPT_TIMEOUT, lastTimeout);
-				curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, lastTimeout);
-			}
+			/* Set timeout */
+			double timeout = control.timeout; /* also for atomicity */
+			if (control.open)
+				timeout = std::max(0.0, lastArrivalTime + timeout - now());
+
+			/* Convert to CURL timeout: measure in ms, 0 = infinity */
+			/* We use CURL timeout of 1ms instead of 0ms */
+			long curlTimeout = 0; /* infinity */
+			if (!isinf(timeout))
+				curlTimeout = std::max(static_cast<long>(timeout * 1000.0), 1L);
+			curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, curlTimeout);
+			curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, curlTimeout);
 
 			/* Send HTTP request */
 			double start = now();
@@ -370,8 +369,8 @@ void processInput(std::string &input, ClientControl &control)
 				fprintf(stderr, "[%f] set count=%d\n", now(), numRequestsLeft);
 			}
 			else if (key == "timeout") {
-				control.timeout = atol(value.c_str());
-				fprintf(stderr, "[%f] set timeout=%ld\n", now(), control.timeout);
+				control.timeout = atof(value.c_str());
+				fprintf(stderr, "[%f] set timeout=%f\n", now(), control.timeout);
 			}
 			else
 				fprintf(stderr, "[%f] unknown key '%s'\n", now(), key.c_str());
@@ -388,7 +387,7 @@ int main(int argc, char **argv)
 	 */
 	std::string url;
 	int concurrency;
-	long timeout;
+	double timeout;
 	double thinkTime;
 	double interval;
 	bool open;
@@ -402,7 +401,7 @@ int main(int argc, char **argv)
 		("help", "produce help message")
 		("url", po::value<std::string>(&url), "set URL to request")
 		("concurrency", po::value<int>(&concurrency)->default_value(100), "set concurrency (number of HTTP client threads)")
-		("timeout", po::value<long>(&timeout)->default_value(0), "set HTTP client timeout in seconds")
+		("timeout", po::value<double>(&timeout)->default_value(INFINITY), "set HTTP client timeout in seconds (default: infinity)")
 		("thinktime", po::value<double>(&thinkTime)->default_value(0), "add a random (à la Poisson) interval between requests in seconds")
 		("interval", po::value<double>(&interval)->default_value(1), "set report interval in seconds")
 		("open", "use the open model with client-side queuing, i.e., arrival times do not depend on the response time of the server")
