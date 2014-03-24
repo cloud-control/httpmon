@@ -80,10 +80,21 @@ typename T::value_type median(T begin, T end)
 	/* assumes vector is sorted */
 	int n = end - begin;
 
-	if ((n-1) % 2 == 0)
-		return *(begin+(n-1)/2);
-	else
-		return (*(begin+(n-1)/2) + *(begin+(n-1)/2+1))/2;
+	/* median is not defined for fewer than 2 items */
+	if (n < 2)
+		return NAN;
+
+	/* even number of items: take average of the middle ones */
+	if (n % 2 == 0) {
+		/* (begin-1) because index computations are 1-based */
+		auto left  = (begin-1) + n / 2;
+		auto right = (begin-1) + n / 2 + 1;
+		return (*left + *right) / 2.0;
+	}
+	else {
+		auto middle = begin + n / 2;
+		return *middle;
+	}
 }
 
 size_t percentileRank(size_t n, double percentile)
@@ -115,7 +126,7 @@ Statistics<typename T::value_type> computeStatistics(T &a)
 
 	s.median = median(a.begin(), a.end());
 	s.lowerQuartile = median(a.begin(), a.begin() + n / 2);
-	s.upperQuartile = median(a.begin() + n / 2, a.end());
+	s.upperQuartile = median(a.begin() + (n+1) / 2, a.end());
 
 	s.percentile95 = a[percentileRank(n, 95)];
 	s.percentile99 = a[percentileRank(n, 99)];
