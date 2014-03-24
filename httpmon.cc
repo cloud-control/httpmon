@@ -207,6 +207,9 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 		if (control.numRequestsLeft-- > 0) {
 			/* Check if timeout has changed */
 			long timeout = control.timeout; /* for atomicity */
+			if (control.open) {
+				timeout = std::max(0L, static_cast<long>((lastArrivalTime + timeout) - now()));
+			}
 			if (timeout != lastTimeout) {
 				lastTimeout = timeout;
 				curl_easy_setopt(curl, CURLOPT_TIMEOUT, lastTimeout);
