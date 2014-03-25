@@ -44,6 +44,7 @@ struct ClientData {
 
 	/* Data collected by clients */
 	std::vector<double> latencies;
+	uint32_t numRequests;
 	uint32_t numOption1;
 	uint32_t numOption2;
 	uint32_t numOpenQueuing;
@@ -54,6 +55,7 @@ struct AccumulatedData {
 	double reportTime;
 
 	std::vector<double> latencies;
+	uint32_t numRequests;
 	uint32_t numOption1;
 	uint32_t numOption2;
 	uint32_t numOpenQueuing;
@@ -237,15 +239,19 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			{
 				std::lock_guard<std::mutex> lock(data.mutex);
 
-				data.latencies.push_back(lastLatency);
-				if (responseFlags & RESPONSEFLAGS_OPTION1)
-					data.numOption1 ++;
-				if (responseFlags & RESPONSEFLAGS_OPTION2)
-					data.numOption2 ++;
-				if (didOpenQueuing)
-					data.numOpenQueuing++;
-				if (error || ((responseFlags & RESPONSEFLAGS_CONTENT) == 0))
+				data.numRequests++;
+				if (error) {
 					data.numErrors++;
+				}
+				else {
+					data.latencies.push_back(lastLatency);
+					if (responseFlags & RESPONSEFLAGS_OPTION1)
+						data.numOption1 ++;
+					if (responseFlags & RESPONSEFLAGS_OPTION2)
+						data.numOption2 ++;
+					if (didOpenQueuing)
+						data.numOpenQueuing++;
+				}
 			}
 		}
 	}
@@ -262,12 +268,14 @@ void report(ClientData &_data, AccumulatedData &accData)
 	{
 		std::lock_guard<std::mutex> lock(_data.mutex);
 		data.latencies = std::move(_data.latencies);
+		data.numRequests = _data.numRequests;
 		data.numOption1 = _data.numOption1;
 		data.numOption2 = _data.numOption2;
 		data.numOpenQueuing = _data.numOpenQueuing;
 		data.numErrors = _data.numErrors;
 
 		_data.latencies.clear();
+		_data.numRequests = 0;
 		_data.numOption1 = 0;
 		_data.numOption2 = 0;
 		_data.numOpenQueuing = 0;
@@ -286,6 +294,7 @@ void report(ClientData &_data, AccumulatedData &accData)
 	auto stats = computeStatistics(data.latencies);
 
 	/* Compute accumulated statistics */
+	accData.numRequests += data.numRequests;
 	accData.numOption1 += data.numOption1;
 	accData.numOption2 += data.numOption2;
 	accData.numOpenQueuing += data.numOpenQueuing;
@@ -293,7 +302,7 @@ void report(ClientData &_data, AccumulatedData &accData)
 	accData.latencies.insert(accData.latencies.end(), data.latencies.begin(), data.latencies.end());
 	auto accStats = computeStatistics(accData.latencies);
 
-	fprintf(stderr, "[%f] latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms latency95=%.0fms latency99=%.0fms throughput=%.0frps rr=%.2f%% cr=%.2f%% accRequests=%d accOption1=%d accOption2=%d accLatency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms accLatency95=%.0fms accLatency99=%.0fms accOpenQueuing=%d accErrors=%d\n",
+	fprintf(stderr, "time=%.6f latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms latency95=%.0fms latency99=%.0fms requests=%d option1=%d option2=%d errors=%d throughput=%.0frps rr=%.2f%% cr=%.2f%% accRequests=%d accOption1=%d accOption2=%d accLatency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms accLatency95=%.0fms accLatency99=%.0fms accOpenQueuing=%d accErrors=%d\n",
 		reportTime,
 		stats.minimum * 1000,
 		stats.lowerQuartile * 1000,
@@ -303,11 +312,15 @@ void report(ClientData &_data, AccumulatedData &accData)
 		stats.average * 1000,
 		stats.percentile95 * 1000,
 		stats.percentile99 * 1000,
+		data.numRequests,
+		data.numOption1,
+		data.numOption2,
+		data.numErrors,
 		throughput,
 		recommendationRate * 100,
 		commentRate * 100,
 		/* Accumulated statistics */
-		(int)accData.latencies.size(),
+		accData.numRequests,
 		accData.numOption1,
 		accData.numOption2,
 		accStats.minimum * 1000,
@@ -452,6 +465,7 @@ int main(int argc, char **argv)
 
 	/* Setup thread data */
 	ClientData data;
+	data.numRequests = 0;
 	data.numOption1 = 0;
 	data.numOption2 = 0;
 	data.numOpenQueuing = 0;
@@ -459,6 +473,7 @@ int main(int argc, char **argv)
 	
 	/* Setup accumulated data */
 	AccumulatedData accData;
+	accData.numRequests = 0;
 	accData.numOption1 = 0;
 	accData.numOption2 = 0;
 	accData.numOpenQueuing = 0;
