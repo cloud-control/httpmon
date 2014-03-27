@@ -302,7 +302,7 @@ void report(ClientData &_data, AccumulatedData &accData)
 	accData.latencies.insert(accData.latencies.end(), data.latencies.begin(), data.latencies.end());
 	auto accStats = computeStatistics(accData.latencies);
 
-	fprintf(stderr, "time=%.6f latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms latency95=%.0fms latency99=%.0fms requests=%d option1=%d option2=%d errors=%d throughput=%.0frps rr=%.2f%% cr=%.2f%% accRequests=%d accOption1=%d accOption2=%d accLatency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms accLatency95=%.0fms accLatency99=%.0fms accOpenQueuing=%d accErrors=%d\n",
+	printf("time=%.6f latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms latency95=%.0fms latency99=%.0fms requests=%d option1=%d option2=%d errors=%d throughput=%.0frps rr=%.2f%% cr=%.2f%% accRequests=%d accOption1=%d accOption2=%d accLatency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms accLatency95=%.0fms accLatency99=%.0fms accOpenQueuing=%d accErrors=%d\n",
 		reportTime,
 		stats.minimum * 1000,
 		stats.lowerQuartile * 1000,
@@ -377,24 +377,24 @@ void processInput(std::string &input, ClientControl &control)
 
 			if (key == "thinktime") {
 				control.thinkTime = atof(value.c_str());
-				fprintf(stderr, "[%f] set thinktime=%f\n", now(), control.thinkTime);
+				printf("time=%.6f thinktime=%f\n", now(), control.thinkTime);
 			}
 			else if (key == "concurrency") {
 				control.concurrency = atoi(value.c_str());
-				fprintf(stderr, "[%f] set concurrency=%d\n", now(), control.concurrency);
+				printf("time=%.6f concurrency=%d\n", now(), control.concurrency);
 			}
 			else if (key == "open") {
 				control.open = atoi(value.c_str());
-				fprintf(stderr, "[%f] set open=%d\n", now(), control.open);
+				printf("time=%.6f open=%d\n", now(), control.open);
 			}
 			else if (key == "count") {
 				int numRequestsLeft = atoi(value.c_str()); /* avoid race */
 				control.numRequestsLeft = numRequestsLeft;
-				fprintf(stderr, "[%f] set count=%d\n", now(), numRequestsLeft);
+				printf("time=%.6f count=%d\n", now(), numRequestsLeft);
 			}
 			else if (key == "timeout") {
 				control.timeout = atof(value.c_str());
-				fprintf(stderr, "[%f] set timeout=%f\n", now(), control.timeout);
+				printf("time=%.6f timeout=%f\n", now(), control.timeout);
 			}
 			else
 				fprintf(stderr, "[%f] unknown key '%s'\n", now(), key.c_str());
