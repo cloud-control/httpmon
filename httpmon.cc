@@ -231,7 +231,11 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			/* Send HTTP request */
 			double start = now();
 			responseFlags = 0;
-			bool error = (curl_easy_perform(curl) != 0);
+			bool error;
+			if (timeout > 0)
+				error = (curl_easy_perform(curl) != 0);
+			else
+				error = true; /* user gave up on this request a long time ago */
 			double lastLatency = now() - start;
 
 			/* Add data to report */
