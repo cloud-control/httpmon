@@ -421,6 +421,9 @@ int main(int argc, char **argv)
 	bool open;
 	int numRequestsLeft;
 
+	/* Make stdout unbuffered */
+	setvbuf(stdout, NULL, _IONBF, 0);
+
 	/*
 	 * Parse command-line
 	 */
@@ -441,7 +444,7 @@ int main(int argc, char **argv)
 	po::notify(vm);
 
 	if (vm.count("help")) {
-		std::cout << desc << "\n";
+		std::cerr << desc << "\n";
 		return 1;
 	}
 	
