@@ -21,14 +21,14 @@ Compiling
 `httpmon` is supposed to work on all Unix-like operating systems, but has only been tested on Ubuntu Linux (12.04.2 LTS and 13.10).
 To compile, you need the following prerequisites:
 
-* GNU compiler collection 4.6.3
-* GNU make 3.81
-* Boost C++ libraries 1.48
-* libcurl 7.22.0
+* GNU compiler collection >= 4.6.3
+* GNU make >= 3.81
+* Boost C++ libraries >= 1.48
+* libcurl >= 7.22.0
 
 Installing this software on top of Ubuntu can be achieved using the following commands:
 
-    sudo apt-get install build-essential libboost1.48-all-dev libcurl4-openssl-dev
+    sudo apt-get install build-essential libboost-all-dev libcurl4-openssl-dev
 
 A primitive `Makefile` is included in the repository:
 
