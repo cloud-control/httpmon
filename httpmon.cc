@@ -36,6 +36,7 @@ struct ClientControl {
 	double thinkTime;
 	double timeout;
 	bool open;
+	bool deterministic;
 };
 
 struct ClientData {
@@ -173,7 +174,10 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 	double lastThinkTime = control.thinkTime;
 	std::exponential_distribution<double> waitDistribution(1.0 / lastThinkTime);
 
-	rng.seed(now() + id);
+	if (control.deterministic)
+		rng.seed(id);
+	else
+		rng.seed(now() + id);
 
 	double lastArrivalTime = now();
 	while (true) {
@@ -419,6 +423,7 @@ int main(int argc, char **argv)
 	double thinkTime;
 	double interval;
 	bool open;
+	bool deterministic;
 	int numRequestsLeft;
 
 	/* Make stdout unbuffered */
@@ -437,6 +442,7 @@ int main(int argc, char **argv)
 		("interval", po::value<double>(&interval)->default_value(1), "set report interval in seconds")
 		("open", "use the open model with client-side queuing, i.e., arrival times do not depend on the response time of the server")
 		("count", po::value<int>(&numRequestsLeft)->default_value(std::numeric_limits<int>::max()), "stop after sending this many requests (default: do not stop)")
+		("deterministic", "do not seed RNG; useful to compare two systems with the exact same requests (default: no)")
 	;
 
 	po::variables_map vm;
@@ -453,6 +459,7 @@ int main(int argc, char **argv)
 	}
 
 	open = vm.count("open");
+	deterministic = vm.count("deterministic");
 
 	/*
 	 * Start HTTP client threads
@@ -469,6 +476,7 @@ int main(int argc, char **argv)
 	control.thinkTime = thinkTime;
 	control.timeout = timeout;
 	control.open = open;
+	control.deterministic = deterministic;
 
 	/* Setup thread data */
 	ClientData data;
