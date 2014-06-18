@@ -1,3 +1,4 @@
+*.csv
 *.o
 core
 httpmon

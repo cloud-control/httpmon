@@ -39,23 +39,34 @@ struct ClientControl {
 	bool deterministic;
 };
 
+struct RequestData {
+	double generatedAt; /*< When was the request generated (according to the model) */
+	double sentAt; /*< What was the request effectively sent to the server; normally the same as generatedAt, except when client-side queuing happened */
+	double repliedAt;
+	bool error;
+	bool option1;
+	bool option2;
+};
+
 struct ClientData {
 	/* Protect this structure from concurrent access */
 	std::mutex mutex;
 
 	/* Data collected by clients */
-	std::vector<double> latencies;
+	std::vector<double> latencies; /* TODO: avoid duplicate with information below */
+	std::vector<RequestData> requests;
 	uint32_t numRequests;
 	uint32_t numOption1;
 	uint32_t numOption2;
 	uint32_t numOpenQueuing;
 	uint32_t numErrors;
-} HttpClientControl;
+};
 
 struct AccumulatedData {
 	double reportTime;
 
-	std::vector<double> latencies;
+	std::vector<double> latencies; /* TODO: avoid duplicate with information below */
+	std::vector<RequestData> requests;
 	uint32_t numRequests;
 	uint32_t numOption1;
 	uint32_t numOption2;
@@ -181,6 +192,8 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 
 	double lastArrivalTime = now();
 	while (true) {
+		RequestData requestData;
+
 		bool didOpenQueuing = false;
 
 		/* Check to see if paramaters have changed and update distribution */
@@ -196,6 +209,7 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 		double interval = 0.0;
 		if (thinkTime > 0) {
 			interval = waitDistribution(rng);
+			requestData.generatedAt = now();
 
 			/* Behave open if requested */
 			/* NOTE: Requests may queue up on the client-side if the server is too slow */
@@ -221,8 +235,12 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 		if (control.numRequestsLeft-- > 0) {
 			/* Set timeout */
 			double timeout = control.timeout; /* also for atomicity */
-			if (control.open)
+			requestData.generatedAt = now();
+			requestData.sentAt = now();
+			if (control.open) {
 				timeout = std::max(0.0, lastArrivalTime + timeout - now());
+				requestData.generatedAt = lastArrivalTime;
+			}
 
 			/* Convert to CURL timeout: measure in ms, 0 = infinity */
 			/* We use CURL timeout of 1ms instead of 0ms */
@@ -233,29 +251,34 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, curlTimeout);
 
 			/* Send HTTP request */
-			double start = now();
 			responseFlags = 0;
-			bool error;
-			if (timeout > 0)
-				error = (curl_easy_perform(curl) != 0);
-			else
-				error = true; /* user gave up on this request a long time ago */
-			double lastLatency = now() - start;
+			if (timeout > 0) {
+				requestData.error = (curl_easy_perform(curl) != 0);
+				requestData.repliedAt = now();
+			}
+			else {
+				requestData.error = true; /* user gave up on this request a long time ago */
+				requestData.repliedAt = NAN;
+			}
+			requestData.option1 = responseFlags & RESPONSEFLAGS_OPTION1;
+			requestData.option2 = responseFlags & RESPONSEFLAGS_OPTION2;
 
 			/* Add data to report */
 			/* XXX: one day, this might be a bottleneck */
 			{
 				std::lock_guard<std::mutex> lock(data.mutex);
 
+				data.requests.push_back(requestData);
+
 				data.numRequests++;
-				if (error) {
+				if (requestData.error) {
 					data.numErrors++;
 				}
 				else {
-					data.latencies.push_back(lastLatency);
-					if (responseFlags & RESPONSEFLAGS_OPTION1)
+					data.latencies.push_back(requestData.repliedAt - requestData.generatedAt);
+					if (requestData.option1)
 						data.numOption1 ++;
-					if (responseFlags & RESPONSEFLAGS_OPTION2)
+					if (requestData.option2)
 						data.numOption2 ++;
 					if (didOpenQueuing)
 						data.numOpenQueuing++;
@@ -276,6 +299,7 @@ void report(ClientData &_data, AccumulatedData &accData)
 	{
 		std::lock_guard<std::mutex> lock(_data.mutex);
 		data.latencies = std::move(_data.latencies);
+		data.requests = std::move(_data.requests);
 		data.numRequests = _data.numRequests;
 		data.numOption1 = _data.numOption1;
 		data.numOption2 = _data.numOption2;
@@ -283,6 +307,7 @@ void report(ClientData &_data, AccumulatedData &accData)
 		data.numErrors = _data.numErrors;
 
 		_data.latencies.clear();
+		_data.requests.clear();
 		_data.numRequests = 0;
 		_data.numOption1 = 0;
 		_data.numOption2 = 0;
@@ -308,6 +333,7 @@ void report(ClientData &_data, AccumulatedData &accData)
 	accData.numOpenQueuing += data.numOpenQueuing;
 	accData.numErrors += data.numErrors;
 	accData.latencies.insert(accData.latencies.end(), data.latencies.begin(), data.latencies.end());
+	accData.requests.insert(accData.requests.end(), data.requests.begin(), data.requests.end());
 	auto accStats = computeStatistics(accData.latencies);
 
 	printf("time=%.6f latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms latency95=%.0fms latency99=%.0fms requests=%d option1=%d option2=%d errors=%d throughput=%.0frps rr=%.2f%% cr=%.2f%% accRequests=%d accOption1=%d accOption2=%d accLatency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms accLatency95=%.0fms accLatency99=%.0fms accOpenQueuing=%d accErrors=%d\n",
@@ -424,6 +450,7 @@ int main(int argc, char **argv)
 	double interval;
 	bool open;
 	bool deterministic;
+	bool dump;
 	int numRequestsLeft;
 
 	/* Make stdout unbuffered */
@@ -443,6 +470,7 @@ int main(int argc, char **argv)
 		("open", "use the open model with client-side queuing, i.e., arrival times do not depend on the response time of the server")
 		("count", po::value<int>(&numRequestsLeft)->default_value(std::numeric_limits<int>::max()), "stop after sending this many requests (default: do not stop)")
 		("deterministic", "do not seed RNG; useful to compare two systems with the exact same requests (default: no)")
+		("dump", "dump all data about requests to httpmon-dump.csv")
 	;
 
 	po::variables_map vm;
@@ -460,6 +488,7 @@ int main(int argc, char **argv)
 
 	open = vm.count("open");
 	deterministic = vm.count("deterministic");
+	dump = vm.count("dump");
 
 	/*
 	 * Start HTTP client threads
@@ -505,11 +534,12 @@ int main(int argc, char **argv)
 	 * Let client threads work, until user interrupts us
 	 */
 
-	/* Block SIGINT and SIGQUIT */
+	/* Block SIGINT, SIGQUIT and SIGTERM */
 	sigset_t sigset;
 	sigemptyset(&sigset);
 	sigaddset(&sigset, SIGINT);
 	sigaddset(&sigset, SIGQUIT);
+	sigaddset(&sigset, SIGTERM);
 	sigprocmask(SIG_BLOCK, &sigset, NULL);
 
 	/* Make stdin non-blocking */
@@ -557,6 +587,22 @@ int main(int argc, char **argv)
 
 	/* Final stats */
 	report(data, accData);
+
+	if (dump) {
+		FILE *f = fopen("httpmon-dump.csv", "w");
+		if (!f) {
+			fprintf(f, "Writing to dumpfile failed\n");
+			return 1;
+		}
+	
+		fprintf(f, "generatedAt,sentAt,repliedAt,responseTime,option1,option2\n");
+		for (auto r : accData.requests) {
+			fprintf(f, "%f,%f,%f,%f,%d,%d\n",
+				r.generatedAt, r.sentAt, r.repliedAt, r.repliedAt - r.generatedAt,
+				r.option1, r.option2);
+		}
+		fclose(f);
+	}
 
 	return 0;
 }
