@@ -165,18 +165,18 @@ size_t nullWriter(char *ptr, size_t size, size_t nmemb, void *userdata)
 
 int httpClientMain(int id, ClientControl &control, ClientData &data)
 {
-	/* Block many signals */
+	/* Block some signals to let master thread deal with them */
 	sigset_t sigset;
 	sigemptyset(&sigset);
 	sigaddset(&sigset, SIGINT);
 	sigaddset(&sigset, SIGQUIT);
 	sigaddset(&sigset, SIGTERM);
-	sigaddset(&sigset, SIGUSR2);
 	pthread_sigmask(SIG_BLOCK, &sigset, NULL);
 
-	/* Set up waiting for SIGUSR2 */
+	/* Block SIGUSR2 so we can deal with it synchronously */
 	sigemptyset(&sigset);
 	sigaddset(&sigset, SIGUSR2);
+	pthread_sigmask(SIG_BLOCK, &sigset, NULL);
 
 	uint32_t responseFlags;
 
