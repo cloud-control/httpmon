@@ -602,11 +602,11 @@ int main(int argc, char **argv)
 			return 1;
 		}
 	
-		fprintf(f, "generatedAt,sentAt,repliedAt,responseTime,option1,option2\n");
+		fprintf(f, "generatedAt,sentAt,repliedAt,responseTime,option1,option2,error\n");
 		for (auto r : accData.requests) {
-			fprintf(f, "%f,%f,%f,%f,%d,%d\n",
+			fprintf(f, "%f,%f,%f,%f,%d,%d,%d\n",
 				r.generatedAt, r.sentAt, r.repliedAt, r.repliedAt - r.generatedAt,
-				r.option1, r.option2);
+				r.option1, r.option2, r.error);
 		}
 		fclose(f);
 	}
