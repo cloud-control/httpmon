@@ -60,6 +60,7 @@ struct ClientData {
 	uint32_t numOption2;
 	uint32_t numOpenQueuing;
 	uint32_t numErrors;
+	uint32_t queueLength;
 };
 
 struct AccumulatedData {
@@ -258,6 +259,10 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, curlTimeout);
 
 			/* Send HTTP request */
+			{
+				std::lock_guard<std::mutex> lock(data.mutex);
+				data.queueLength++;
+			}
 			responseFlags = 0;
 			if (timeout > 0) {
 				requestData.error = (curl_easy_perform(curl) != 0);
@@ -275,6 +280,7 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			{
 				std::lock_guard<std::mutex> lock(data.mutex);
 
+				data.queueLength--;
 				data.requests.push_back(requestData);
 
 				data.numRequests++;
@@ -312,6 +318,7 @@ void report(ClientData &_data, AccumulatedData &accData)
 		data.numOption2 = _data.numOption2;
 		data.numOpenQueuing = _data.numOpenQueuing;
 		data.numErrors = _data.numErrors;
+		data.queueLength = _data.queueLength;
 
 		_data.latencies.clear();
 		_data.requests.clear();
@@ -320,6 +327,7 @@ void report(ClientData &_data, AccumulatedData &accData)
 		_data.numOption2 = 0;
 		_data.numOpenQueuing = 0;
 		_data.numErrors = 0;
+		/* _data.queueLength must not be reset */
 	}
 	
 	/* Compute how much time passed */
@@ -331,6 +339,7 @@ void report(ClientData &_data, AccumulatedData &accData)
 	double throughput = (double)data.latencies.size() / dt;
 	double recommendationRate = (double)data.numOption1 / data.latencies.size();
 	double commentRate = (double)data.numOption2 / data.latencies.size();
+	int queueLength = data.queueLength;
 	auto stats = computeStatistics(data.latencies);
 
 	/* Compute accumulated statistics */
@@ -343,7 +352,7 @@ void report(ClientData &_data, AccumulatedData &accData)
 	accData.requests.insert(accData.requests.end(), data.requests.begin(), data.requests.end());
 	auto accStats = computeStatistics(accData.latencies);
 
-	printf("time=%.6f latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms latency95=%.0fms latency99=%.0fms requests=%d option1=%d option2=%d errors=%d throughput=%.0frps rr=%.2f%% cr=%.2f%% accRequests=%d accOption1=%d accOption2=%d accLatency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms accLatency95=%.0fms accLatency99=%.0fms accOpenQueuing=%d accErrors=%d\n",
+	printf("time=%.6f latency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms latency95=%.0fms latency99=%.0fms requests=%d option1=%d option2=%d errors=%d throughput=%.0frps ql=%d rr=%.2f%% cr=%.2f%% accRequests=%d accOption1=%d accOption2=%d accLatency=%.0f:%.0f:%.0f:%.0f:%.0f:(%.0f)ms accLatency95=%.0fms accLatency99=%.0fms accOpenQueuing=%d accErrors=%d\n",
 		reportTime,
 		stats.minimum * 1000,
 		stats.lowerQuartile * 1000,
@@ -358,6 +367,7 @@ void report(ClientData &_data, AccumulatedData &accData)
 		data.numOption2,
 		data.numErrors,
 		throughput,
+		queueLength,
 		recommendationRate * 100,
 		commentRate * 100,
 		/* Accumulated statistics */
@@ -521,6 +531,7 @@ int main(int argc, char **argv)
 	data.numOption2 = 0;
 	data.numOpenQueuing = 0;
 	data.numErrors = 0;
+	data.queueLength = 0;
 	
 	/* Setup accumulated data */
 	AccumulatedData accData;
