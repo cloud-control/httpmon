@@ -10,6 +10,7 @@ Besides generating the traffic, `httpmon` periodically reports certain statistic
 * response-time, also called user-perceived *latency*, in the format: `minimum:lower-quartile:median:upper-quartile:maximum:(average)`;
 * 95 and 99-percentile latency;
 * throughput, i.e., requests per second;
+* queue length, i.e., number of requests sent which have yet to receive a reply;
 * rate and accumulated number of requests containing option 1;
 * rate and accumulated number of requests containing option 2.
 
