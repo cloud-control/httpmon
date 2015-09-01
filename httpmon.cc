@@ -255,6 +255,7 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			long curlTimeout = 0; /* infinity */
 			if (!isinf(timeout))
 				curlTimeout = std::max(static_cast<long>(timeout * 1000.0), 1L);
+			curl_easy_setopt(curl, CURLOPT_URL, control.url.c_str());
 			curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, curlTimeout);
 			curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, curlTimeout);
 
@@ -425,8 +426,12 @@ void processInput(std::string &input, ClientControl &control)
 			}
 			std::string key = keyvalue[0];
 			std::string value = keyvalue[1];
-
-			if (key == "thinktime") {
+			
+			if (key == "url") {
+				control.url = value;
+				printf("time=%.6f url=%s\n", now(), control.url.c_str());
+			}
+			else if (key == "thinktime") {
 				control.thinkTime = atof(value.c_str());
 				printf("time=%.6f thinktime=%f\n", now(), control.thinkTime);
 			}
