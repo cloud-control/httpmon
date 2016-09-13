@@ -615,7 +615,7 @@ int main(int argc, char **argv)
 	if (dump) {
 		FILE *f = fopen("httpmon-dump.csv", "w");
 		if (!f) {
-			fprintf(f, "Writing to dumpfile failed\n");
+			fprintf(stderr, "Writing to dumpfile failed\n");
 			return 1;
 		}
 	
