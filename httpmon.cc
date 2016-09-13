@@ -8,6 +8,7 @@
 #include <chrono>
 #include <curl/curl.h>
 #include <fcntl.h>
+#include <iostream>
 #include <limits>
 #include <mutex>
 #include <poll.h>
