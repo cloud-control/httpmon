@@ -266,6 +266,9 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 				headers = curl_slist_append(headers, "Accept-Encoding: gzip");
 			}
 			curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
+			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYSTATUS, false);
 
 			/* Send HTTP request */
 			{
