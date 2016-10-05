@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:15.10
 MAINTAINER Cristian Klein <cristian.klein@cs.umu.se>
 
 RUN apt-get -qq update
