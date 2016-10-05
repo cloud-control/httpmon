@@ -14,6 +14,7 @@
 #include <poll.h>
 #include <random>
 #include <signal.h>
+#include <sys/resource.h>
 #include <thread>
 #include <vector>
 
@@ -536,6 +537,14 @@ int main(int argc, char **argv)
 	 */
 
 	curl_global_init(CURL_GLOBAL_ALL);
+
+	/* Set high number of files */
+	struct rlimit rlimit_nofile;
+	getrlimit(RLIMIT_NOFILE, &rlimit_nofile);
+	rlimit_nofile.rlim_cur = rlimit_nofile.rlim_max;
+	setrlimit(RLIMIT_NOFILE, &rlimit_nofile);
+	if ((int)rlimit_nofile.rlim_cur < concurrency + 10)
+		fprintf(stderr, "WARNING: httpmon's file number limit (%d) is lower than concurrency (%d). Expect requests to fail!\n", (int)rlimit_nofile.rlim_max, concurrency);
 
 	/* Setup thread control */
 	ClientControl control;
