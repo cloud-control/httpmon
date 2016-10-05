@@ -38,6 +38,7 @@ struct ClientControl {
 	double timeout;
 	bool open;
 	bool deterministic;
+	bool compressed;
 };
 
 struct RequestData {
@@ -259,6 +260,12 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			curl_easy_setopt(curl, CURLOPT_URL, control.url.c_str());
 			curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, curlTimeout);
 			curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, curlTimeout);
+			
+			struct curl_slist *headers = NULL;
+			if (control.compressed) {
+				headers = curl_slist_append(headers, "Accept-Encoding: gzip");
+			}
+			curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
 			/* Send HTTP request */
 			{
@@ -268,6 +275,7 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			responseFlags = 0;
 			if (timeout > 0) {
 				requestData.error = (curl_easy_perform(curl) != 0);
+				curl_slist_free_all(headers);
 				requestData.repliedAt = now();
 			}
 			else {
@@ -444,6 +452,10 @@ void processInput(std::string &input, ClientControl &control)
 				control.open = atoi(value.c_str());
 				printf("time=%.6f open=%d\n", now(), control.open);
 			}
+			else if (key == "compressed") {
+				control.compressed = atoi(value.c_str());
+				printf("time=%.6f compressed=%d\n", now(), control.compressed);
+			}
 			else if (key == "count") {
 				int numRequestsLeft = atoi(value.c_str()); /* avoid race */
 				control.numRequestsLeft = numRequestsLeft;
@@ -472,6 +484,7 @@ int main(int argc, char **argv)
 	double thinkTime;
 	double interval;
 	bool open;
+	bool compressed;
 	bool deterministic;
 	bool dump;
 	int numRequestsLeft;
@@ -491,6 +504,7 @@ int main(int argc, char **argv)
 		("thinktime", po::value<double>(&thinkTime)->default_value(0), "add a random (à la Poisson) interval between requests in seconds")
 		("interval", po::value<double>(&interval)->default_value(1), "set report interval in seconds")
 		("open", "use the open model with client-side queuing, i.e., arrival times do not depend on the response time of the server")
+		("compressed", "request the server to GZip compress the response")
 		("count", po::value<int>(&numRequestsLeft)->default_value(std::numeric_limits<int>::max()), "stop after sending this many requests (default: do not stop)")
 		("deterministic", "do not seed RNG; useful to compare two systems with the exact same requests (default: no)")
 		("dump", "dump all data about requests to httpmon-dump.csv")
@@ -510,6 +524,7 @@ int main(int argc, char **argv)
 	}
 
 	open = vm.count("open");
+	compressed = vm.count("compressed");
 	deterministic = vm.count("deterministic");
 	dump = vm.count("dump");
 
@@ -528,6 +543,7 @@ int main(int argc, char **argv)
 	control.thinkTime = thinkTime;
 	control.timeout = timeout;
 	control.open = open;
+	control.compressed = compressed;
 	control.deterministic = deterministic;
 
 	/* Setup thread data */
