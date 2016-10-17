@@ -5,8 +5,7 @@ RUN apt-get -qq update \
     && apt-get -qqy install \
         build-essential \
         libboost-all-dev \
-        libcurl4-openssl-dev \
-        libssl-dev \
+        libcurl4-nss-dev \
     && rm -rf /var/lib/apt/lists/* 
 COPY * /httpmon/
 RUN \

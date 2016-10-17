@@ -18,8 +18,6 @@
 #include <thread>
 #include <vector>
 
-#include "threaded-ssl.hh"
-
 #define RESPONSEFLAGS_CONTENT 0x01
 #define RESPONSEFLAGS_OPTION1 0x02
 #define RESPONSEFLAGS_OPTION2 0x04
@@ -539,7 +537,6 @@ int main(int argc, char **argv)
 	 */
 
 	curl_global_init(CURL_GLOBAL_ALL);
-	init_locks();
 
 	/* Set high number of files */
 	struct rlimit rlimit_nofile;
@@ -639,7 +636,6 @@ int main(int argc, char **argv)
 		thread.join();
 	}
 	curl_global_cleanup();
-	kill_locks();
 
 	/* Final stats */
 	report(data, accData);
