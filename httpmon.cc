@@ -256,7 +256,7 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			/* Convert to CURL timeout: measure in ms, 0 = infinity */
 			/* We use CURL timeout of 1ms instead of 0ms */
 			long curlTimeout = 0; /* infinity */
-			if (!isinf(timeout))
+			if (!std::isinf(timeout))
 				curlTimeout = std::max(static_cast<long>(timeout * 1000.0), 1L);
 			curl_easy_setopt(curl, CURLOPT_URL, control.url.c_str());
 			curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, curlTimeout);

@@ -1,8 +1,8 @@
-FROM ubuntu:15.10
+FROM ubuntu:16.04
 MAINTAINER Cristian Klein <cklein@cs.umu.se>
 
 RUN apt-get -qq update \
-    && apt-get -qqy install \
+    && DEBIAN_FRONTEND=noninteractive apt-get -qqy install \
         build-essential \
         libboost-all-dev \
         libcurl4-nss-dev \
