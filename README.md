@@ -54,6 +54,52 @@ Examples:
 
         ./httpmon --url http://example.com/testWebPage --concurrency 100 --thinktime 1 --open
 
+Output
+------
+
+This section explains the output of `httpmon`. The tool regularly reports some metrics on standard output. Reporting occurs by default every second, but can be overwritten with the `--reportInterval` command-line option.
+
+Each report is printed on one line, formatted as a list of `metricName=metricValue`. Let us discuss each `metricName`:
+
+* `time=1492213912.126146`: time at which reporting occurred, i.e., the time at which this line was printed, in UNIX timestamp;
+
+The next metrics are related to **requests for which a reply was received during the last report interval**:
+
+* `latency=15:71:89:4994:46723:(9708)ms`:
+latency (response time); the format is `minimum:firstQuartile:median:thirdQuartile:maximum:(average)`;
+
+* `latency95=46529ms`, `latency99=46692ms`: 95th and 99th percentile latency;
+
+* `requests=1612`: number of requests;
+
+* `option1=0`, `option2=0`: two metrics relevant for [brownout applications](http://kleinlabs.eu/research.html#brownout-or-how-to-deal-with-capacity-shortage), the number of requests with optional content type 1 and type 2; for simplicity, a reply contains such optional content if it contains the byte 128 or 129, respectively;
+
+* `errors=476`: number of failed requests; causes of failure includes invalid URL, timeout (server overload) or 4xx/5xx HTTP code;
+
+* `throughput=46rps`: `requests` divided by `reportInterval`;
+
+* `ql=0`: queue length, i.e., number of requests sent for which a reply is pending;
+
+* `rr=0.00%`: `option1` divided by `requests`;
+
+* `cr=0.00%`: `option2` divided by `requests`;
+
+The following metrics are related to all requests for which a reply was received **since `httpmon`'s start**:
+
+* `accRequests=277705`: total number of requests
+
+* `accOption1=0 accOption2=0`: total number of requests received with option type 1 and 2 (see above for what this means);
+
+* `accLatency=1:56:80:115:49791:(302)ms`: statistics of latencies (response times), format is `min:firstQuartile:median:lastQuartile:max:(average)`;
+
+* `accLatency95=201ms accLatency99=9592ms`: 95th and 99th percentile latency
+
+* `accOpenQueuing=0`: When using the `--open` parameter, `httpmon` tries to emulate an open-system workload generator, i.e., the performance of the webserver does not slow down the workload generator. When this emulation failed, generally because the webserver was too slow, then this counter is incremented.
+
+* `accErrors=32522`: total number of failed requests.
+
+Note that, if you are interested in latencies (reponse times) of requests individually instead of statistics, then `httpmon` can dump such information if given the `--dump` command-line option.
+
 Contact
 -------
 
