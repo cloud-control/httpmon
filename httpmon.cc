@@ -11,12 +11,15 @@
 #include <iostream>
 #include <limits>
 #include <mutex>
+#include <netinet/ip.h>
 #include <poll.h>
 #include <random>
 #include <signal.h>
 #include <sys/resource.h>
 #include <thread>
 #include <vector>
+
+#include "tailtamer.h"
 
 #define RESPONSEFLAGS_CONTENT 0x01
 #define RESPONSEFLAGS_OPTION1 0x02
@@ -40,6 +43,7 @@ struct ClientControl {
 	bool open;
 	bool deterministic;
 	bool compressed;
+	bool insert_uat;
 };
 
 struct RequestData {
@@ -83,6 +87,13 @@ double inline now()
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 	return (double)tv.tv_usec / 1000000 + tv.tv_sec;
+}
+
+uint64_t inline now64()
+{
+	struct timespec ts;
+	clock_gettime(CLOCK_REALTIME, &ts);
+	return ts.tv_sec * 1000000000 + ts.tv_nsec;
 }
 
 template<typename T>
@@ -167,6 +178,15 @@ size_t nullWriter(char *ptr, size_t size, size_t nmemb, void *userdata)
 	return size * nmemb; /* i.e., pretend we are actually doing something */
 }
 
+int sockopt_callback(void *clientp, curl_socket_t curlfd, curlsocktype purpose)
+{
+	curl_socket_t *saved_curl_socket = (curl_socket_t *)clientp;
+
+	set_socket_uat(curlfd, now64());
+	*saved_curl_socket = curlfd;
+	return CURL_SOCKOPT_OK;
+}
+
 int httpClientMain(int id, ClientControl &control, ClientData &data)
 {
 	/* Block some signals to let master thread deal with them */
@@ -183,6 +203,7 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 	pthread_sigmask(SIG_BLOCK, &sigset, NULL);
 
 	uint32_t responseFlags;
+	curl_socket_t curl_socket; // allows us to update UAT after each request
 
 	CURL *curl = curl_easy_init();
 	curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
@@ -191,6 +212,10 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseFlags);
 	curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 60L);
+	if (control.insert_uat) {
+		curl_easy_setopt(curl, CURLOPT_SOCKOPTFUNCTION, sockopt_callback);
+		curl_easy_setopt(curl, CURLOPT_SOCKOPTDATA, &curl_socket);
+	}
 
 	std::default_random_engine rng; /* random number generator */
 	double lastThinkTime = control.thinkTime;
@@ -278,6 +303,8 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			}
 			responseFlags = 0;
 			if (timeout > 0) {
+				if (control.insert_uat)
+					set_socket_uat(curl_socket, now64());
 				requestData.error = (curl_easy_perform(curl) != 0);
 				curl_slist_free_all(headers);
 				requestData.repliedAt = now();
@@ -492,6 +519,7 @@ int main(int argc, char **argv)
 	bool deterministic;
 	bool dump;
 	int numRequestsLeft;
+	bool insert_uat;
 
 	/* Make stdout unbuffered */
 	setvbuf(stdout, NULL, _IONBF, 0);
@@ -512,6 +540,7 @@ int main(int argc, char **argv)
 		("count", po::value<int>(&numRequestsLeft)->default_value(std::numeric_limits<int>::max()), "stop after sending this many requests (default: do not stop)")
 		("deterministic", "do not seed RNG; useful to compare two systems with the exact same requests (default: no)")
 		("dump", "dump all data about requests to httpmon-dump.csv")
+		("insertuat", "insert UAT on all requests")
 	;
 
 	po::variables_map vm;
@@ -531,6 +560,7 @@ int main(int argc, char **argv)
 	compressed = vm.count("compressed");
 	deterministic = vm.count("deterministic");
 	dump = vm.count("dump");
+	insert_uat = vm.count("insertuat");
 
 	/*
 	 * Start HTTP client threads
@@ -557,6 +587,7 @@ int main(int argc, char **argv)
 	control.open = open;
 	control.compressed = compressed;
 	control.deterministic = deterministic;
+	control.insert_uat = insert_uat;
 
 	/* Setup thread data */
 	ClientData data;
