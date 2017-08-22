@@ -203,7 +203,7 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 	pthread_sigmask(SIG_BLOCK, &sigset, NULL);
 
 	uint32_t responseFlags;
-	curl_socket_t curl_socket; // allows us to update UAT after each request
+	curl_socket_t curl_socket = -1; // allows us to update UAT after each request
 
 	CURL *curl = curl_easy_init();
 	curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
@@ -304,7 +304,8 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			responseFlags = 0;
 			if (timeout > 0) {
 				if (control.insert_uat)
-					set_socket_uat(curl_socket, now64());
+					if (curl_socket != -1)
+						set_socket_uat(curl_socket, now64());
 				requestData.error = (curl_easy_perform(curl) != 0);
 				curl_slist_free_all(headers);
 				requestData.repliedAt = now();
