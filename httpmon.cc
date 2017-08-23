@@ -178,15 +178,6 @@ size_t nullWriter(char *ptr, size_t size, size_t nmemb, void *userdata)
 	return size * nmemb; /* i.e., pretend we are actually doing something */
 }
 
-int sockopt_callback(void *clientp, curl_socket_t curlfd, curlsocktype purpose)
-{
-	curl_socket_t *saved_curl_socket = (curl_socket_t *)clientp;
-
-	set_socket_uat(curlfd, now64());
-	*saved_curl_socket = curlfd;
-	return CURL_SOCKOPT_OK;
-}
-
 int httpClientMain(int id, ClientControl &control, ClientData &data)
 {
 	/* Block some signals to let master thread deal with them */
@@ -203,7 +194,6 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 	pthread_sigmask(SIG_BLOCK, &sigset, NULL);
 
 	uint32_t responseFlags;
-	curl_socket_t curl_socket = -1; // allows us to update UAT after each request
 
 	CURL *curl = curl_easy_init();
 	curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
@@ -212,10 +202,6 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseFlags);
 	curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 60L);
-	if (control.insert_uat) {
-		curl_easy_setopt(curl, CURLOPT_SOCKOPTFUNCTION, sockopt_callback);
-		curl_easy_setopt(curl, CURLOPT_SOCKOPTDATA, &curl_socket);
-	}
 
 	std::default_random_engine rng; /* random number generator */
 	double lastThinkTime = control.thinkTime;
@@ -304,8 +290,7 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			responseFlags = 0;
 			if (timeout > 0) {
 				if (control.insert_uat)
-					if (curl_socket != -1)
-						set_socket_uat(curl_socket, now64());
+					set_comm_uat(now64());
 				requestData.error = (curl_easy_perform(curl) != 0);
 				curl_slist_free_all(headers);
 				requestData.repliedAt = now();
