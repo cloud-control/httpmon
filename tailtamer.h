@@ -23,8 +23,10 @@ struct ip_tt_hdr {
     uint8_t hdrlen;
     be16 reserved1;
     be32 reserved2;
-    be64 uat;     /* nanoseconds since UNIX epoch; lasts until 2554 */
+    be64 uat;     /* nanoseconds since UNIX epoch; lasts until 2554; last bit is set for tracing */
 };
+
+#define UAT_TRACE (1<<0)
 
 /**
  * Set the uat ip option for a socket.

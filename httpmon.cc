@@ -44,6 +44,7 @@ struct ClientControl {
 	bool deterministic;
 	bool compressed;
 	bool insert_uat;
+	bool uat_trace;
 };
 
 struct RequestData {
@@ -289,8 +290,12 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			}
 			responseFlags = 0;
 			if (timeout > 0) {
-				if (control.insert_uat)
-					set_comm_uat(now64());
+				if (control.insert_uat) {
+					if (control.uat_trace)
+						set_comm_uat(now64() | UAT_TRACE);
+					else
+						set_comm_uat(now64() & ~UAT_TRACE);
+				}
 				requestData.error = (curl_easy_perform(curl) != 0);
 				curl_slist_free_all(headers);
 				requestData.repliedAt = now();
@@ -506,6 +511,7 @@ int main(int argc, char **argv)
 	bool dump;
 	int numRequestsLeft;
 	bool insert_uat;
+	bool uat_trace;
 
 	/* Make stdout unbuffered */
 	setvbuf(stdout, NULL, _IONBF, 0);
@@ -527,6 +533,7 @@ int main(int argc, char **argv)
 		("deterministic", "do not seed RNG; useful to compare two systems with the exact same requests (default: no)")
 		("dump", "dump all data about requests to httpmon-dump.csv")
 		("insertuat", "insert UAT on all requests")
+		("uattrace", "activate tracing with UAT")
 	;
 
 	po::variables_map vm;
@@ -547,6 +554,7 @@ int main(int argc, char **argv)
 	deterministic = vm.count("deterministic");
 	dump = vm.count("dump");
 	insert_uat = vm.count("insertuat");
+	uat_trace = vm.count("uattrace");
 
 	/*
 	 * Start HTTP client threads
@@ -574,6 +582,7 @@ int main(int argc, char **argv)
 	control.compressed = compressed;
 	control.deterministic = deterministic;
 	control.insert_uat = insert_uat;
+	control.uat_trace = uat_trace;
 
 	/* Setup thread data */
 	ClientData data;
