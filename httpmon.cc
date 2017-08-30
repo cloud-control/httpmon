@@ -278,6 +278,18 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			if (control.compressed) {
 				headers = curl_slist_append(headers, "Accept-Encoding: gzip");
 			}
+			if (control.insert_uat) {
+				uint64_t uat;
+				if (control.uat_trace)
+					uat = now64() | UAT_TRACE;
+				else
+					uat = now64() & ~UAT_TRACE;
+				set_comm_uat(uat);
+
+				char buf[100];
+				snprintf(buf, 100, "UAT: %lu", uat);
+				headers = curl_slist_append(headers, buf);
+			}
 			curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
@@ -290,12 +302,6 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			}
 			responseFlags = 0;
 			if (timeout > 0) {
-				if (control.insert_uat) {
-					if (control.uat_trace)
-						set_comm_uat(now64() | UAT_TRACE);
-					else
-						set_comm_uat(now64() & ~UAT_TRACE);
-				}
 				requestData.error = (curl_easy_perform(curl) != 0);
 				curl_slist_free_all(headers);
 				requestData.repliedAt = now();
