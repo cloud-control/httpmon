@@ -492,6 +492,7 @@ int main(int argc, char **argv)
 	bool deterministic;
 	bool dump;
 	int numRequestsLeft;
+	bool terminateAfterCount;
 
 	/* Make stdout unbuffered */
 	setvbuf(stdout, NULL, _IONBF, 0);
@@ -510,6 +511,7 @@ int main(int argc, char **argv)
 		("open", "use the open model with client-side queuing, i.e., arrival times do not depend on the response time of the server")
 		("compressed", "request the server to GZip compress the response")
 		("count", po::value<int>(&numRequestsLeft)->default_value(std::numeric_limits<int>::max()), "stop after sending this many requests (default: do not stop)")
+		("terminate-after-count", "terminate httpmon after sending count requests (default: do not terminate)")
 		("deterministic", "do not seed RNG; useful to compare two systems with the exact same requests (default: no)")
 		("dump", "dump all data about requests to httpmon-dump.csv")
 	;
@@ -531,6 +533,7 @@ int main(int argc, char **argv)
 	compressed = vm.count("compressed");
 	deterministic = vm.count("deterministic");
 	dump = vm.count("dump");
+	terminateAfterCount = vm.count("terminate-after-count");
 
 	/*
 	 * Start HTTP client threads
@@ -623,8 +626,17 @@ int main(int argc, char **argv)
 			httpClientThreads.back().detach();
 			httpClientThreads.pop_back();
 		}
+
+		/* Honor terminate after count */
+		if (terminateAfterCount && control.numRequestsLeft <= 0) {
+			control.running = false;
+			signo = -1;
+		}
 	}
-	fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
+	if (signo == -1)
+		fprintf(stderr, "All requests sent, cleaning up ...\n");
+	else
+		fprintf(stderr, "Got signal %d, cleaning up ...\n", signo);
 
 	/*
 	 * Cleanup
