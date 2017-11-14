@@ -610,6 +610,9 @@ int main(int argc, char **argv)
 	accData.numOpenQueuing = 0;
 	accData.numErrors = 0;
 
+	/* Declare self as UAT entry-point */
+	set_comm_uat(0);
+
 	/* Start client threads */
 	std::vector<std::thread> httpClientThreads;
 	for (int i = 0; i < concurrency; i++) {
