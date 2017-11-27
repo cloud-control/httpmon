@@ -279,11 +279,11 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 				headers = curl_slist_append(headers, "Accept-Encoding: gzip");
 			}
 			if (control.insert_uat) {
-				uint64_t uat;
+				uint64_t uat = requestData.generatedAt * NanoSecondsInASecond;
 				if (control.uat_trace)
-					uat = now64() | UAT_TRACE;
+					uat |= UAT_TRACE;
 				else
-					uat = now64() & ~UAT_TRACE;
+					uat &= ~UAT_TRACE;
 				set_comm_uat(uat);
 
 				char buf[100];
