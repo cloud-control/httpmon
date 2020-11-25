@@ -229,7 +229,7 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 				double nextArrivalTime = lastArrivalTime + interval;
 				interval = std::max(nextArrivalTime - now(), 0.0);
 				if (interval == 0.0)
-					didOpenQueuing++;
+					didOpenQueuing = true;
 				lastArrivalTime = nextArrivalTime;
 			}
 		}
