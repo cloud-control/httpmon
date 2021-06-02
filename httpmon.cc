@@ -40,10 +40,9 @@ struct ClientControl {
 	bool open;
 	bool deterministic;
 	bool compressed;
-	bool get;
 	bool post;
-    std::string body;
-    std::string header;
+	std::string body;
+	std::vector<std::string> headers;
 };
 
 struct RequestData {
@@ -270,8 +269,11 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			if (control.compressed) {
 				headers = curl_slist_append(headers, "Accept-Encoding: gzip");
 			}
-			if (!control.header.empty()) {
-			    headers = curl_slist_append(headers, control.header.c_str());
+			if (!control.headers.empty()) {
+				for(std::size_t i = 0; i < control.headers.size(); ++i) {
+					headers = curl_slist_append(headers, control.headers[i].c_str());
+				}
+
 			}
 			curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
@@ -279,25 +281,18 @@ int httpClientMain(int id, ClientControl &control, ClientData &data)
 			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYSTATUS, false);
 
 			/* configure POST  if needed */
-            if (control.post || !control.body.empty()){
-                curl_easy_setopt(curl, CURLOPT_POSTFIELDS, control.body);
-            }
+			if (control.post || !control.body.empty()){
+				curl_easy_setopt(curl, CURLOPT_POSTFIELDS, control.body);
+			}
 			/* Send HTTP request */
 			{
 				std::lock_guard<std::mutex> lock(data.mutex);
 				data.queueLength++;
 			}
 			responseFlags = 0;
-            CURLcode res;
-            if (timeout > 0) {
-                res = curl_easy_perform(curl);
-                if(res == CURLE_OK) {
-                    long response_code;
-                    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-                }
-                requestData.error = (curl_easy_perform(curl) != 0);
+			if (timeout > 0) {
+				requestData.error = (curl_easy_perform(curl) != 0);
 				curl_slist_free_all(headers);
-
 				requestData.repliedAt = now();
 			}
 			else {
@@ -511,10 +506,9 @@ int main(int argc, char **argv)
 	bool dump;
 	int numRequestsLeft;
 	bool terminateAfterCount;
-    bool get;
-    bool post;
+	bool post;
 	std::string body;
-	std::string header;
+	std::vector<std::string> headers;
 
 	/* Make stdout unbuffered */
 	setvbuf(stdout, NULL, _IONBF, 0);
@@ -525,10 +519,9 @@ int main(int argc, char **argv)
 	po::options_description desc("Real-time monitor of a HTTP server's throughput and latency");
 	desc.add_options()
 		("help", "produce help message")
-        ("get", "set GET as HTTP method of the request")
-        ("post", "set POST as HTTP method of the request")
-        ("body", po::value<std::string>(&body), "set the body of POST requests")
-        ("header", po::value<std::string>(&header), "set the optional header for requests")
+		("post", "set POST as HTTP method of the request")
+		("body", po::value<std::string>(&body), "set the body of POST requests")
+		("headers", po::value<std::vector<std::string>>(&headers), "set the optional header for requests")
 		("url", po::value<std::string>(&url), "set URL to request")
 		("concurrency", po::value<int>(&concurrency)->default_value(100), "set concurrency (number of HTTP client threads)")
 		("timeout", po::value<double>(&timeout)->default_value(INFINITY), "set HTTP client timeout in seconds (default: infinity)")
@@ -561,7 +554,6 @@ int main(int argc, char **argv)
 	dump = vm.count("dump");
 	terminateAfterCount = vm.count("terminate-after-count");
 	post = vm.count("post");
-	get = vm.count("get");
 
 	/*
 	 * Start HTTP client threads
@@ -588,9 +580,8 @@ int main(int argc, char **argv)
 	control.open = open;
 	control.compressed = compressed;
 	control.deterministic = deterministic;
-	control.get = get;
 	control.post = post;
-	control.header = header;
+	control.headers = headers;
 	control.body = body;
 
 	/* Setup thread data */
@@ -613,8 +604,8 @@ int main(int argc, char **argv)
 	/* Start client threads */
 	std::vector<std::thread> httpClientThreads;
 	for (int i = 0; i < concurrency; i++) {
-        httpClientThreads.emplace_back(httpClientMain, i,
-                           std::ref(control), std::ref(data));
+		httpClientThreads.emplace_back(httpClientMain, i,
+			std::ref(control), std::ref(data));
 	}
 
 	/*
